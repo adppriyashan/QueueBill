@@ -160,9 +160,45 @@
     </div>
     
     <div class="col-12 col-lg-4">
+        <!-- Google Drive Integration Card -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-2 bg-success-soft text-success me-3">
+                        <i class="fab fa-google-drive fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Google Drive</h5>
+                        <p class="text-secondary mb-0 fs-8">Automated statement backups</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                @if($user->google_access_token)
+                    <div class="alert alert-success d-flex align-items-center mb-3 fs-7" role="alert" style="background-color: rgba(25, 135, 84, 0.1); color: #198754; border: 0;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <div>
+                            Connected to <strong class="text-dark">{{ $user->google_email }}</strong>
+                        </div>
+                    </div>
+                    <form action="{{ route('auth.google.disconnect') }}" method="POST" onsubmit="return confirm('Disconnect Google Drive?')">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                            <i class="fas fa-unlink me-1"></i> Disconnect Drive
+                        </button>
+                    </form>
+                @else
+                    <p class="fs-7 text-secondary mb-3">Sync generated billing invoices directly to your personal or team Google Drive paths automatically.</p>
+                    <a href="{{ route('auth.google') }}" class="btn btn-success btn-sm w-100 text-white">
+                        <i class="fab fa-google me-1"></i> Connect Google Drive
+                    </a>
+                @endif
+            </div>
+        </div>
+
         <!-- Help Card -->
-        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white h-100 p-4" style="background: var(--primary-gradient) !important;">
-            <div class="d-flex flex-column h-100 justify-content-between">
+        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4" style="background: var(--primary-gradient) !important;">
+            <div class="d-flex flex-column justify-content-between">
                 <div>
                     <h5 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Dynamic Currency</h5>
                     <p class="fs-7 opacity-75 mb-3">Changing this setting updates all monetary values in real-time:</p>
@@ -170,7 +206,7 @@
                         <li class="mb-2">Admin Dashboard reports & total rollups.</li>
                         <li class="mb-2">Subscription services contract directories.</li>
                         <li class="mb-2">Generated PDF statements & live template previews.</li>
-                        <li class="mb-2">Simulated broadcast logs & Google Drive uploads.</li>
+                        <li class="mb-2">System broadcast logs & Google Drive uploads.</li>
                     </ul>
                 </div>
                 <div class="mt-4 pt-3 border-top border-white-50">

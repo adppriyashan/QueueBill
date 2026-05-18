@@ -284,6 +284,55 @@
                     </div>
                 </div>
             </div>
+            <!-- Section: Recent Delivery Logs -->
+            @php
+                $serviceEmailLogs = \App\Models\EmailLog::whereIn('invoice_id', $service->invoices->pluck('id'))->latest()->take(5)->get();
+            @endphp
+            @if($serviceEmailLogs->isNotEmpty())
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4">
+                <div class="card-header bg-white border-bottom p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Recent Outgoing Document Emails</h5>
+                        <a href="{{ route('logs.index') }}" class="btn btn-sm btn-light border fs-8"><i class="fas fa-external-link-alt me-1"></i>All Logs</a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-premium mb-0 align-middle fs-7">
+                            <thead>
+                                <tr>
+                                    <th>Subject Title</th>
+                                    <th>Date / Time</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($serviceEmailLogs as $log)
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold text-primary d-block">{{ $log->subject }}</span>
+                                            <small class="text-muted d-block text-truncate fs-9" style="max-width: 200px;" title="{{ $log->body }}">{{ $log->body }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary fs-8">{{ $log->created_at->format('M d, Y H:i') }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success-soft text-success"><i class="fas fa-check me-1"></i>{{ strtoupper($log->status) }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ route('invoices.show', $log->invoice_id) }}" class="btn btn-sm btn-outline-primary py-1 px-2 fs-8 rounded-3" target="_blank" title="View Document">
+                                                <i class="fas fa-external-link-alt me-1"></i>View Doc
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 @endsection

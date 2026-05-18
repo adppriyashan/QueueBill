@@ -8,7 +8,13 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\EmailLog;
 use App\Models\GoogleDriveLog;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\InvoiceStatementMail;
+use App\Services\GoogleDriveService;
 
 class ProcessAutomatedInvoicesCommand extends Command
 {
@@ -39,8 +45,8 @@ class ProcessAutomatedInvoicesCommand extends Command
         // Query active services where next_billing_date <= today AND next_billing_date <= to_date
         $services = RecurringService::where('status', 'active')
             ->where('next_billing_date', '<=', $today->copy()->endOfDay()->toDateTimeString())
-            ->where('next_billing_date', '<=', \DB::raw('to_date'))
-            ->with(['company', 'invoiceStructureTemplate', 'pendingInvoiceLines'])
+            ->where('next_billing_date', '<=', DB::raw('to_date'))
+            ->with(['company', 'invoiceStructureTemplate', 'pendingInvoiceLines', 'creator'])
             ->get();
 
         if ($services->isEmpty()) {
@@ -137,33 +143,74 @@ class ProcessAutomatedInvoicesCommand extends Command
                 'total' => $subtotal
             ]);
 
-            // 8. Simulated Email Broadcast dispatch
-            $creator = \App\Models\User::find($service->created_by);
+            // Load relations for PDF rendering context
+            $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems', 'creator']);
+
+            // Generate PDF statement
+            $pdf = Pdf::loadView('invoices.show', compact('invoice'));
+            $pdfData = $pdf->output();
+            $pdfFilename = "{$invoiceNumber}_v1.pdf";
+
+            // 8. Real Email Broadcast dispatch
+            $creator = $service->creator;
             $currency = $creator->currency ?? '$';
             $senderEmail = $service->invoiceStructureTemplate->sender_email ?? 'billing@queuebill.com';
+            $subjectText = "New Statement Generated: {$invoiceNumber} - QueueBill";
+            $bodyText = "Dear {$service->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nPlease find your invoice document attached to this email.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nWarm Regards,\n" . ($creator->company_name ?? 'QueueBill Automation System') . ".";
+
+            $emailStatus = 'failed';
+            try {
+                Mail::to($service->company->email)->send(new InvoiceStatementMail($subjectText, $bodyText, $pdfData, $pdfFilename));
+                $emailStatus = 'sent';
+                $this->info("  -> Real email statement successfully sent to {$service->company->email}");
+            } catch (\Exception $e) {
+                $this->error("  -> Failed to send real email: " . $e->getMessage());
+            }
+
             EmailLog::create([
                 'invoice_id' => $invoice->id,
                 'sender' => $senderEmail,
                 'recipient' => $service->company->email,
-                'subject' => "New Statement Generated: {$invoiceNumber} - QueueBill",
-                'body' => "Dear {$service->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nPlease find your invoice document attached to this email.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nWarm Regards,\n" . ($creator->company_name ?? 'QueueBill Automation System') . ".",
-                'status' => 'sent'
+                'subject' => $subjectText,
+                'body' => $bodyText,
+                'status' => $emailStatus
             ]);
 
-            // 9. Simulated Google Drive upload action
+            // 9. Real Google Drive upload action
             $drivePath = $service->google_drive_path ?? '/QueueBill/Invoices';
+            $driveStatus = 'failed';
+            $driveDetails = "Simulated or no integration connected.";
+
+            if ($creator && $creator->google_access_token) {
+                try {
+                    $driveService = resolve(GoogleDriveService::class);
+                    $fileId = $driveService->uploadFile($creator, $pdfFilename, $pdfData, $drivePath);
+                    $driveStatus = 'success';
+                    $driveDetails = "Invoice v1 successfully uploaded and saved to Google Drive (ID: {$fileId}) at: '{$drivePath}'.";
+                    $this->info("  -> Real Google Drive upload successful!");
+                } catch (\Exception $e) {
+                    $driveDetails = "Failed to upload to Google Drive: " . $e->getMessage();
+                    $this->error("  -> Google Drive upload failed: " . $e->getMessage());
+                }
+            } else {
+                $driveDetails = "Google Drive not connected for the subscription creator. Connect Google Drive in Settings to enable automated backup.";
+                $this->warn("  -> Google Drive not connected for user " . ($creator->name ?? 'Unknown') . ". Sync skipped.");
+            }
+
             GoogleDriveLog::create([
                 'invoice_id' => $invoice->id,
                 'google_drive_path' => $drivePath,
-                'file_name' => "{$invoiceNumber}_v1.pdf",
-                'status' => 'success',
-                'details' => "Invoice v1 processed and saved securely to Google Drive registered path: '{$drivePath}'."
+                'file_name' => $pdfFilename,
+                'status' => $driveStatus,
+                'details' => $driveDetails
             ]);
 
-            // Save upload stamp on invoice
-            $invoice->update([
-                'uploaded_to_drive_at' => now()
-            ]);
+            if ($driveStatus === 'success') {
+                // Save upload stamp on invoice
+                $invoice->update([
+                    'uploaded_to_drive_at' => now()
+                ]);
+            }
 
             // 10. Advance next_billing_date cycle window
             $nextBillingDate = clone $periodFrom;

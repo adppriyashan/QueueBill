@@ -8,6 +8,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InvoiceStructureTemplateController;
 use App\Http\Controllers\RecurringServiceController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\GoogleDriveController;
 
 // Public / Guest Auth Routes
 Route::middleware('guest')->group(function () {
@@ -56,4 +57,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [HomeController::class, 'settings'])->name('settings');
     Route::post('/settings', [HomeController::class, 'updateSettings'])->name('settings.update');
     Route::post('/settings/profile', [HomeController::class, 'updateProfile'])->name('settings.profile.update');
+
+    // Google Drive OAuth integration
+    Route::get('/auth/google', [GoogleDriveController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleDriveController::class, 'callback'])->name('auth.google.callback');
+    Route::post('/auth/google/disconnect', [GoogleDriveController::class, 'disconnect'])->name('auth.google.disconnect');
 });

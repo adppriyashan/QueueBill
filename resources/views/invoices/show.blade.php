@@ -155,7 +155,7 @@
                     @else
                         <span class="sheet-badge mb-2 d-inline-block">Standard Statement (v1)</span>
                     @endif
-                    <h2 class="fw-bold tracking-tight mb-1">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</h2>
+                    <h2 class="fw-bold tracking-tight mb-1">{{ $invoice->creator?->company_name ?? 'QueueBill Automation System' }}</h2>
                     <p class="fs-8 mb-0 opacity-75">Layout branded via template: <strong>{{ $invoice->recurringService?->invoiceStructureTemplate?->title ?? 'Default Template' }}</strong></p>
                 </div>
                 <div class="text-md-end">
@@ -170,8 +170,8 @@
                 <div class="row g-4 mb-5 fs-7">
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed From</h6>
-                        <strong class="text-dark d-block">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</strong>
-                        <span class="text-muted d-block">{!! nl2br(e(auth()->user()->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}</span>
+                        <strong class="text-dark d-block">{{ $invoice->creator?->company_name ?? 'QueueBill Automation System' }}</strong>
+                        <span class="text-muted d-block">{!! nl2br(e($invoice->creator?->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}</span>
                         
                         <!-- Custom Fallback Email overridden via template properties -->
                         <span class="text-primary fw-medium d-block mt-2">
@@ -254,7 +254,7 @@
                                     </td>
                                     <td class="text-center text-secondary">1</td>
                                     <td class="text-end fw-bold text-dark">
-                                        @currency($baseItem->amount)
+                                        {{ format_currency($baseItem->amount, $invoice->created_by) }}
                                     </td>
                                 </tr>
                             @endif
@@ -272,9 +272,9 @@
                                     <td class="text-center text-secondary">1</td>
                                     <td class="text-end fw-bold text-dark">
                                         @if($item->amount < 0)
-                                            <span class="text-success">-@currency(abs($item->amount))</span>
+                                            <span class="text-success">-{{ format_currency(abs($item->amount), $invoice->created_by) }}</span>
                                         @else
-                                            @currency($item->amount)
+                                            {{ format_currency($item->amount, $invoice->created_by) }}
                                         @endif
                                     </td>
                                 </tr>
@@ -288,11 +288,11 @@
                     <div class="col-12 col-md-5">
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span class="text-secondary fw-semibold">Subtotal:</span>
-                            <span class="fw-bold text-dark">@currency($invoice->subtotal)</span>
+                            <span class="fw-bold text-dark">{{ format_currency($invoice->subtotal, $invoice->created_by) }}</span>
                         </div>
                         <div class="d-flex justify-content-between py-3 border-bottom fs-6">
                             <span class="text-dark fw-bold">Total Amount Due:</span>
-                            <span class="fw-extrabold text-theme-price fs-4 fw-bold">@currency($invoice->total)</span>
+                            <span class="fw-extrabold text-theme-price fs-4 fw-bold">{{ format_currency($invoice->total, $invoice->created_by) }}</span>
                         </div>
                         <div class="mt-4">
                             <span class="text-muted fs-8 font-italic">"Your Recurring Revenue, Perfectly Aligned."</span>
@@ -440,7 +440,7 @@
 
                     <!-- Amount -->
                     <div class="mb-4">
-                        <label for="retro_amount" class="form-label text-secondary fw-semibold fs-8">Financial Adjustment Amount (@currencySymbol) <span class="text-danger">*</span></label>
+                        <label for="retro_amount" class="form-label text-secondary fw-semibold fs-8">Financial Adjustment Amount ({{ currency_symbol($invoice->created_by) }}) <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" class="form-control form-control-sm @error('amount') is-invalid @enderror" id="retro_amount" name="amount" required placeholder="0.00">
                         @error('amount')
                             <div class="invalid-feedback">{{ $message }}</div>
