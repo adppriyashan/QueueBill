@@ -270,8 +270,14 @@
         <div class="sheet-header-bar">
             <table class="sheet-header-table">
                 <tr>
+                    <td style="width: 25%;">
+                        <img src="https://queuebill.com/assets/brand/icon-800.png" alt="Logo" style="width: 150px;">
+                    </td>
                     <td>
                         <h2>{{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}</h2>
+                        <span class="fs-8">{{ $invoice->creator?->company_address ?? '' }}</span>
+                        <span class="fs-8">{{ $invoice->creator?->company_email ?? '' }}</span>
+                        <span class="fs-8">{{ $invoice->creator?->company_phone ?? '' }}</span>
                     </td>
                     <td style="text-align: right;">
                         <h3>INVOICE @if($invoice->version > 1) (Revised) @endif</h3>
