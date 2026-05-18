@@ -16,6 +16,8 @@ QueueBill is a B2B subscription scheduling and automated billing engine built on
 *   **🔄 Scenario B: Retroactive Adjustments & Version Control**: Perform post-billing statement revisions. Inject retroactive charges on an issued invoice to automatically increment document versions (`v1 ➔ v2 ➔ v3`), recalculate subtotals, append a "REVISED STATEMENT" badge, log simulated dispatch emails, and upload simulated revision PDFs to the registered Google Drive path.
 *   **⚙️ Midnight Cron Billing Runner**: Robust console Artisan task processing active schedules, advancing calendars, rolls up subtotals, logs simulated dispatches in `email_logs`, and logs simulated Google Drive file uploads in `google_drive_logs`.
 *   **📊 Console Cockpit Dashboard**: View high-level metrics, active schedules, generated ledger statements, and run manual sandbox tick billing runs from a single unified workspace.
+*   **🎛️ Settings & User Profile Security**: Configure system-wide dynamic currency symbols (supporting `$`, `€`, `£`, `¥`, `Rs.`, `LKR`, `රු.`, `RM`, `AED`, `CHF`) dynamically adapting all metrics, ledgers, and contract creation/editing fields. Supports name edits and optional password resets with strict read-only email constraints.
+*   **👁️ Pre-emptive Next Statement Forecast**: Preview future billing cycles before they execute. Features a pro-forma invoice generator rendering base contract rates, scope inclusions, and pending ad-hoc injections styled under selected template gradients.
 
 ---
 

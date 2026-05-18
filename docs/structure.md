@@ -72,7 +72,9 @@ QueueBill/
 │       │   ├── create.blade.php
 │       │   ├── edit.blade.php
 │       │   ├── index.blade.php
+│       │   ├── preview_invoice.blade.php             <-- next cycle invoice forecast preview [NEW]
 │       │   └── show.blade.php                        <-- Scenario A pending lines
+│       ├── settings.blade.php                        <-- currency & account profile dashboard [NEW]
 │       └── templates/
 │           ├── create.blade.php
 │           ├── edit.blade.php
