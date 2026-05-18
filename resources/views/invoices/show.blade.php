@@ -150,7 +150,7 @@
             <!-- Sheet Header -->
             <div class="sheet-header-bar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                 <div>
-                    <h2 class="fw-bold tracking-tight mb-1">{{ $invoice->creator?->company_name ?? 'QueueBill Automation System' }}</h2>
+                    <h2 class="fw-bold tracking-tight mb-1">{{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}</h2>
                 </div>
                 <div class="text-md-end">
                     <h3 class="fw-bold mb-0">INVOICE @if($invoice->version > 1) (Revised) @endif</h3>
@@ -164,7 +164,7 @@
                 <div class="row g-4 mb-5 fs-7">
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed From</h6>
-                        <strong class="text-dark d-block">{{ $invoice->creator?->company_name ?? 'QueueBill Automation System' }}</strong>
+                        <strong class="text-dark d-block">{{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}</strong>
                         <span class="text-muted d-block">{!! nl2br(e($invoice->creator?->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}</span>
                         
                         <!-- Custom Fallback Email overridden via template properties -->

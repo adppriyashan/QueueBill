@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             if (! Schema::hasColumn('users', 'company_name')) {
-                $table->string('company_name')->nullable()->default('QueueBill Automation System')->after('currency');
+                $table->string('company_name')->nullable()->default('QueueBill')->after('currency');
             }
         });
 

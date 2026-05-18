@@ -96,7 +96,7 @@ class InvoiceController extends Controller
         // 4. Real Email Dispatch (Revised Statement)
         $senderEmail = $invoice->recurringService?->invoiceStructureTemplate?->sender_email ?? 'billing@queuebill.com';
         $creator = auth()->user() ?? User::first();
-        $senderCompany = $creator ? $creator->company_name : 'QueueBill Automation System';
+        $senderCompany = $creator ? $creator->company_name : env('APP_NAME', 'QueueBill');
 
         $bodyText = "Dear {$invoice->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\n" .
                     "Please find attached the Revised Statement (version {$newVersion}) for Invoice {$invoice->invoice_number}.\n\n" .
@@ -182,7 +182,7 @@ class InvoiceController extends Controller
     {
         // 1. Gather context
         $creator = $invoice->creator;
-        $senderCompany = $creator->company_name ?? 'QueueBill Automation System';
+        $senderCompany = $creator->company_name ?? env('APP_NAME', 'QueueBill');
         $senderEmail = $invoice->recurringService?->invoiceStructureTemplate?->sender_email ?? 'billing@queuebill.com';
         $currency = $creator->currency ?? '$';
 

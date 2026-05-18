@@ -271,7 +271,7 @@
             <table class="sheet-header-table">
                 <tr>
                     <td>
-                        <h2>{{ $invoice->creator?->company_name ?? 'QueueBill Automation System' }}</h2>
+                        <h2>{{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}</h2>
                     </td>
                     <td style="text-align: right;">
                         <h3>INVOICE @if($invoice->version > 1) (Revised) @endif</h3>
@@ -290,7 +290,7 @@
                     <td>
                         <div class="meta-heading">Billed From</div>
                         <div class="meta-content">
-                            <strong>{{ $invoice->creator?->company_name ?? 'QueueBill Automation System' }}</strong>
+                            <strong>{{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}</strong>
                             {!! nl2br(e($invoice->creator?->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}
                             
                             <!-- Custom Fallback Email overridden via template properties -->

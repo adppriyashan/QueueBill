@@ -133,7 +133,7 @@
                 <div>
                     <span class="invoice-badge mb-3 d-inline-block">Simulated Statement</span>
                     <h2 class="fw-bold tracking-tight mb-1">
-                        {{ auth()->user()->company_name ?? 'QueueBill Automation System' }}
+                        {{ auth()->user()->company_name ?? env('APP_NAME', 'QueueBill') }}
                     </h2>
                 </div>
                 <div class="text-md-end">
@@ -148,7 +148,7 @@
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed From</h6>
                         <strong
-                            class="text-dark d-block">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</strong>
+                            class="text-dark d-block">{{ auth()->user()->company_name ?? env('APP_NAME', 'QueueBill') }}</strong>
                         <span
                             class="text-muted d-block">{!! nl2br(e(auth()->user()->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}</span>
                         <!-- Custom Fallback Email overridden via template properties -->

@@ -170,7 +170,7 @@
             <div class="sheet-header-bar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                 <div>
                     <span class="sheet-badge mb-2 d-inline-block"><i class="fas fa-magic me-1"></i>Next Cycle Forecast</span>
-                    <h2 class="fw-bold tracking-tight mb-1">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</h2>
+                    <h2 class="fw-bold tracking-tight mb-1">{{ auth()->user()->company_name ?? env('APP_NAME', 'QueueBill') }}</h2>
                 </div>
                 <div class="text-md-end">
                     <span class="fs-6 opacity-75">#{{ $invoiceNumber }}</span>
@@ -183,7 +183,7 @@
                 <div class="row g-4 mb-5 fs-7">
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed From</h6>
-                        <strong class="text-dark d-block">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</strong>
+                        <strong class="text-dark d-block">{{ auth()->user()->company_name ?? env('APP_NAME', 'QueueBill') }}</strong>
                         <span class="text-muted d-block">{!! nl2br(e(auth()->user()->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}</span>
                         
                         <!-- Custom Fallback Email overridden via template properties -->

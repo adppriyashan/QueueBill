@@ -156,7 +156,7 @@ class ProcessAutomatedInvoicesCommand extends Command
             $currency = $creator->currency ?? '$';
             $senderEmail = $service->invoiceStructureTemplate->sender_email ?? 'billing@queuebill.com';
             $subjectText = "New Statement Generated: {$invoiceNumber} - QueueBill";
-            $bodyText = "Dear {$service->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nPlease find your invoice document attached to this email.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nWarm Regards,\n" . ($creator->company_name ?? 'QueueBill Automation System') . ".";
+            $bodyText = "Dear {$service->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nPlease find your invoice document attached to this email.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nWarm Regards,\n" . ($creator->company_name ?? env('APP_NAME', 'QueueBill')) . ".";
 
             $emailStatus = 'failed';
             try {
