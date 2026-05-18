@@ -97,6 +97,10 @@
         .container-fluid {
             padding: 0 !important;
         }
+        .row {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
         /* Hide everything except the invoice column sheet */
         .sidebar, .navbar, .alert, .btn, .card:not(.invoice-sheet), form, .col-lg-4, footer {
             display: none !important;

@@ -100,6 +100,10 @@
         .container-fluid {
             padding: 0 !important;
         }
+        .row {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
         /* Hide everything except the invoice sheet */
         .sidebar, .navbar, .alert, .btn, button, a, footer {
             display: none !important;
