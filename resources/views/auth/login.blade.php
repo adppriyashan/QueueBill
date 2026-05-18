@@ -61,8 +61,8 @@
 
             <div class="text-center">
                 <p class="text-muted fs-7 mb-0">
-                    Don't have an administrative account? <a href="{{ route('register') }}"
-                        class="text-primary fw-semibold text-decoration-none">Sign Up</a>
+                    <small>Don't have an account? <a href="{{ route('register') }}"
+                            class="text-primary fw-semibold text-decoration-none"> Create yours</a></small>
                 </p>
             </div>
         </form>

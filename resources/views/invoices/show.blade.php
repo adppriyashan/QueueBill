@@ -150,16 +150,10 @@
             <!-- Sheet Header -->
             <div class="sheet-header-bar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                 <div>
-                    @if($invoice->version > 1)
-                        <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-1.5 fs-8 text-uppercase"><i class="fas fa-exclamation-triangle me-1"></i>Revised Statement (v{{ $invoice->version }})</span>
-                    @else
-                        <span class="sheet-badge mb-2 d-inline-block">Standard Statement (v1)</span>
-                    @endif
                     <h2 class="fw-bold tracking-tight mb-1">{{ $invoice->creator?->company_name ?? 'QueueBill Automation System' }}</h2>
-                    <p class="fs-8 mb-0 opacity-75">Layout branded via template: <strong>{{ $invoice->recurringService?->invoiceStructureTemplate?->title ?? 'Default Template' }}</strong></p>
                 </div>
                 <div class="text-md-end">
-                    <h3 class="fw-bold mb-0">INVOICE</h3>
+                    <h3 class="fw-bold mb-0">INVOICE @if($invoice->version > 1) (Revised) @endif</h3>
                     <span class="fs-6 opacity-75">#{{ $invoice->invoice_number }}</span>
                 </div>
             </div>
@@ -185,6 +179,7 @@
                                 hello@queuebill.com <small class="text-muted">(System Default)</small>
                             @endif
                         </span>
+                        <br>
                     </div>
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed To</h6>
@@ -193,6 +188,7 @@
                         <span class="text-primary fw-medium d-block mt-2">
                             <i class="far fa-envelope me-1"></i>{{ $invoice->company->email }}
                         </span>
+                        <br>
                     </div>
                     <div class="col-12 col-md-4 text-md-end">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Cycle Timeline</h6>
@@ -200,6 +196,7 @@
                         <div class="mb-1"><strong>Due Date:</strong> <span class="text-muted">{{ $invoice->due_date->format('M d, Y') }}</span></div>
                         <div class="mb-1"><strong>Period From:</strong> <span class="text-muted">{{ $invoice->period_from->format('M d, Y') }}</span></div>
                         <div class="mb-1"><strong>Period To:</strong> <span class="text-muted">{{ $invoice->period_to->format('M d, Y') }}</span></div>
+                        <br>
                     </div>
                 </div>
 
@@ -240,10 +237,8 @@
                                 <tr>
                                     <td>
                                         <div class="fw-semibold text-dark">{{ $baseItem->description }}</div>
-                                        <span class="badge bg-primary-soft text-primary fs-9 px-2 py-0.5 mt-1 d-inline-block">Standard Base Cost</span>
                                         @if($scopeItems->isNotEmpty())
-                                            <div class="mt-3 text-secondary">
-                                                <div class="fw-bold fs-8 text-uppercase tracking-wider mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">Included Contract Scope Elements:</div>
+                                            <div class="mt-1 text-secondary">
                                                 <ul class="ps-3 mb-0 fs-8" style="list-style-type: square;">
                                                     @foreach($scopeItems as $scope)
                                                         <li>{{ $scope->description }}</li>

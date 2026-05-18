@@ -55,7 +55,7 @@
                     <h5 class="fw-bold mb-1">Company Listing</h5>
                     <p class="text-secondary mb-0 fs-7">Manage accounts, validation engines, and inline billing tracking</p>
                 </div>
-                <a href="{{ route('companies.create') }}" class="btn btn-primary btn-md d-inline-flex align-items-center">
+                <a href="{{ route('companies.create') }}" class="btn btn-primary btn-sm d-inline-flex align-items-center">
                     <i class="fas fa-plus me-2"></i>Add New Company
                 </a>
             </div>
@@ -110,16 +110,21 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-1">
-                                        <a href="{{ route('companies.show', $company) }}" class="btn btn-sm bg-primary-soft text-primary" title="Historical Profile">
+                                        <a href="{{ route('companies.show', $company) }}"
+                                            class="btn btn-sm bg-primary-soft text-primary" title="Historical Profile">
                                             <i class="fas fa-history"></i>
                                         </a>
-                                        <a href="{{ route('companies.edit', $company) }}" class="btn btn-sm bg-warning-soft text-warning" title="Edit Details">
+                                        <a href="{{ route('companies.edit', $company) }}"
+                                            class="btn btn-sm bg-warning-soft text-warning" title="Edit Details">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('companies.destroy', $company) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to deactivate/delete this company?')">
+                                        <form action="{{ route('companies.destroy', $company) }}" method="POST"
+                                            class="d-inline-block"
+                                            onsubmit="return confirm('Are you sure you want to deactivate/delete this company?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm bg-danger-soft text-danger" title="Deactivate / Delete">
+                                            <button type="submit" class="btn btn-sm bg-danger-soft text-danger"
+                                                title="Deactivate / Delete">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>

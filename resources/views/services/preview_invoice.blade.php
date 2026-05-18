@@ -171,10 +171,8 @@
                 <div>
                     <span class="sheet-badge mb-2 d-inline-block"><i class="fas fa-magic me-1"></i>Next Cycle Forecast</span>
                     <h2 class="fw-bold tracking-tight mb-1">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</h2>
-                    <p class="fs-8 mb-0 opacity-75">Layout branded via template: <strong>{{ $service->invoiceStructureTemplate?->title ?? 'Default Template' }}</strong></p>
                 </div>
                 <div class="text-md-end">
-                    <h3 class="fw-bold mb-0">PRO-FORMA</h3>
                     <span class="fs-6 opacity-75">#{{ $invoiceNumber }}</span>
                 </div>
             </div>
@@ -200,6 +198,7 @@
                                 hello@queuebill.com <small class="text-muted">(System Default)</small>
                             @endif
                         </span>
+                        <br>
                     </div>
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed To</h6>
@@ -208,13 +207,13 @@
                         <span class="text-primary fw-medium d-block mt-2">
                             <i class="far fa-envelope me-1"></i>{{ $service->company->email }}
                         </span>
+                        <br>
                     </div>
                     <div class="col-12 col-md-4 text-md-end">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Cycle Timeline</h6>
                         <div class="mb-1"><strong>Forecast Date:</strong> <span class="text-muted">{{ $periodFrom->format('M d, Y') }}</span></div>
                         <div class="mb-1"><strong>Due Date:</strong> <span class="text-muted">{{ $periodFrom->copy()->addDays(14)->format('M d, Y') }}</span></div>
-                        <div class="mb-1"><strong>Period From:</strong> <span class="text-muted">{{ $periodFrom->format('M d, Y') }}</span></div>
-                        <div class="mb-1"><strong>Period To:</strong> <span class="text-muted">{{ $periodTo->format('M d, Y') }}</span></div>
+                        <br>
                     </div>
                 </div>
 
@@ -256,10 +255,8 @@
                                 <tr>
                                     <td>
                                         <div class="fw-semibold text-dark">{{ $baseItem->description }}</div>
-                                        <span class="badge bg-primary-soft text-primary fs-9 px-2 py-0.5 mt-1 d-inline-block">Standard Base Cost</span>
                                         @if($scopeItems->isNotEmpty())
-                                            <div class="mt-3 text-secondary">
-                                                <div class="fw-bold fs-8 text-uppercase tracking-wider mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">Included Contract Scope Elements:</div>
+                                            <div class="mt-1 text-secondary">
                                                 <ul class="ps-3 mb-0 fs-8" style="list-style-type: square;">
                                                     @foreach($scopeItems as $scope)
                                                         <li>{{ $scope->description }}</li>
@@ -307,11 +304,11 @@
                             <span class="fw-bold text-dark">@currency($subtotal)</span>
                         </div>
                         <div class="d-flex justify-content-between py-3 border-bottom fs-6">
-                            <span class="text-dark fw-bold">Total Forecast Due:</span>
+                            <span class="text-dark fw-bold">Total:</span>
                             <span class="fw-extrabold text-theme-price fs-4 fw-bold">@currency($total)</span>
                         </div>
                         <div class="mt-4">
-                            <span class="text-muted fs-8 font-italic">"Your Recurring Revenue, Perfectly Aligned."</span>
+                            <span class="text-muted fs-8 font-italic">"This is a computationally generated invoice."</span>
                         </div>
                     </div>
                 </div>

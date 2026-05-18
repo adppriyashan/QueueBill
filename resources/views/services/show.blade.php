@@ -48,8 +48,7 @@
                             </div>
                             <div class="col-6">
                                 <label class="text-muted fs-8 text-uppercase fw-semibold d-block">Base Price</label>
-                                <span
-                                    class="fw-extrabold text-primary fs-5 fw-bold">@currency($service->base_cost)</span>
+                                <span class="fw-extrabold text-primary fs-5 fw-bold">@currency($service->base_cost)</span>
                             </div>
                         </div>
 
@@ -110,7 +109,8 @@
                 </div>
 
                 <div class="card-footer bg-light border-top p-3 d-flex flex-column gap-2">
-                    <a href="{{ route('services.preview-next-invoice', $service) }}" class="btn btn-primary btn-sm w-100 py-2 fw-semibold"><i
+                    <a href="{{ route('services.preview-next-invoice', $service) }}"
+                        class="btn btn-primary btn-sm w-100 py-2 fw-semibold"><i
                             class="fas fa-file-invoice-dollar me-2"></i>Preview Next Statement</a>
                     <div class="d-flex gap-2">
                         <a href="{{ route('services.edit', $service) }}" class="btn btn-warning btn-sm flex-grow-1"><i
@@ -154,8 +154,9 @@
                                     required placeholder="e.g. Migration Setup Credit or Server Overage Fee">
                             </div>
                             <div class="col-12 col-md-3">
-                                <label class="text-muted fs-8 text-uppercase fw-semibold d-block">Amount (@currencySymbol) <span
-                                        class="text-danger">*</span></label>
+                                <label for="amount" class="form-label fs-8 text-secondary fw-semibold">Amount
+                                    (@currencySymbol)
+                                    Description <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control form-control-sm" id="amount"
                                     name="amount" required placeholder="0.00">
                             </div>
@@ -186,7 +187,8 @@
                                         <td>
                                             <div class="fw-semibold text-dark">{{ $line->description }}</div>
                                             <div class="text-muted fs-8">Injected by {{ $line->creator?->name ?? 'System' }} on
-                                                {{ $line->created_at->format('M d, Y') }}</div>
+                                                {{ $line->created_at->format('M d, Y') }}
+                                            </div>
                                         </td>
                                         <td>
                                             @if($line->amount < 0)
@@ -289,49 +291,55 @@
                 $serviceEmailLogs = \App\Models\EmailLog::whereIn('invoice_id', $service->invoices->pluck('id'))->latest()->take(5)->get();
             @endphp
             @if($serviceEmailLogs->isNotEmpty())
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4">
-                <div class="card-header bg-white border-bottom p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold mb-0">Recent Outgoing Document Emails</h5>
-                        <a href="{{ route('logs.index') }}" class="btn btn-sm btn-light border fs-8"><i class="fas fa-external-link-alt me-1"></i>All Logs</a>
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4">
+                    <div class="card-header bg-white border-bottom p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0">Recent Outgoing Document Emails</h5>
+                            <a href="{{ route('logs.index') }}" class="btn btn-sm btn-light border fs-8"><i
+                                    class="fas fa-external-link-alt me-1"></i>All Logs</a>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-premium mb-0 align-middle fs-7">
-                            <thead>
-                                <tr>
-                                    <th>Subject Title</th>
-                                    <th>Date / Time</th>
-                                    <th>Status</th>
-                                    <th class="text-end">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($serviceEmailLogs as $log)
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-premium mb-0 align-middle fs-7">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <span class="fw-semibold text-primary d-block">{{ $log->subject }}</span>
-                                            <small class="text-muted d-block text-truncate fs-9" style="max-width: 200px;" title="{{ $log->body }}">{{ $log->body }}</small>
-                                        </td>
-                                        <td>
-                                            <span class="text-secondary fs-8">{{ $log->created_at->format('M d, Y H:i') }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success-soft text-success"><i class="fas fa-check me-1"></i>{{ strtoupper($log->status) }}</span>
-                                        </td>
-                                        <td class="text-end">
-                                            <a href="{{ route('invoices.show', $log->invoice_id) }}" class="btn btn-sm btn-outline-primary py-1 px-2 fs-8 rounded-3" target="_blank" title="View Document">
-                                                <i class="fas fa-external-link-alt me-1"></i>View Doc
-                                            </a>
-                                        </td>
+                                        <th>Subject Title</th>
+                                        <th>Date / Time</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Action</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach($serviceEmailLogs as $log)
+                                        <tr>
+                                            <td>
+                                                <span class="fw-semibold text-primary d-block">{{ $log->subject }}</span>
+                                                <small class="text-muted d-block text-truncate fs-9" style="max-width: 200px;"
+                                                    title="{{ $log->body }}">{{ $log->body }}</small>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="text-secondary fs-8">{{ $log->created_at->format('M d, Y H:i') }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success-soft text-success"><i
+                                                        class="fas fa-check me-1"></i>{{ strtoupper($log->status) }}</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <a href="{{ route('invoices.show', $log->invoice_id) }}"
+                                                    class="btn btn-sm btn-outline-primary py-1 px-2 fs-8 rounded-3" target="_blank"
+                                                    title="View Document">
+                                                    <i class="fas fa-external-link-alt me-1"></i>View Doc
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endif
         </div>
     </div>
