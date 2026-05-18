@@ -87,7 +87,7 @@
                         </div>
                         <div>
                             <h6 class="text-secondary fw-semibold mb-1 fs-7">Aggregate Billed Revenue</h6>
-                            <h3 class="fw-bold mb-0 text-dark">${{ number_format($company->invoices()->sum('total'), 2) }}</h3>
+                            <h3 class="fw-bold mb-0 text-dark">@currency($company->invoices()->sum('total'))</h3>
                         </div>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                                         <span class="badge bg-secondary-soft text-secondary text-capitalize font-weight-semibold">{{ $service->recurring_cadence }}</span>
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-dark">${{ number_format($service->base_cost, 2) }}</span>
+                                        <span class="fw-bold text-dark">@currency($service->base_cost)</span>
                                     </td>
                                     <td>
                                         <span class="text-dark fw-medium">{{ $service->next_billing_date->format('M d, Y') }}</span>
@@ -191,7 +191,7 @@
                                         <span class="fs-7 text-secondary">{{ $invoice->period_from->format('M d') }} - {{ $invoice->period_to->format('M d, Y') }}</span>
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-dark">${{ number_format($invoice->total, 2) }}</span>
+                                        <span class="fw-bold text-dark">@currency($invoice->total)</span>
                                     </td>
                                     <td>
                                         @if($invoice->version > 1)

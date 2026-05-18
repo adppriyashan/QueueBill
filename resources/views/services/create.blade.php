@@ -96,9 +96,9 @@
                             @enderror
                         </div>
                         <div class="col-12 col-sm-6">
-                            <label for="base_cost" class="form-label text-secondary fw-semibold fs-7">Financial Base Cost Rate ($) <span class="text-danger">*</span></label>
+                            <label for="base_cost" class="form-label text-secondary fw-semibold fs-7">Financial Base Cost Rate (@currencySymbol) <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <span class="input-group-text">$</span>
+                                <span class="input-group-text">@currencySymbol</span>
                                 <input type="number" step="0.01" min="0" class="form-control @error('base_cost') is-invalid @enderror" id="base_cost" name="base_cost" value="{{ old('base_cost', '0.00') }}" required placeholder="0.00">
                             </div>
                             @error('base_cost')
