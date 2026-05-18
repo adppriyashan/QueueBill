@@ -27,7 +27,7 @@
                 </div>
                 <div>
                     <h6 class="text-secondary fw-semibold mb-1 fs-7">Total Revenue Invoiced</h6>
-                    <h3 class="fw-bold mb-0 text-dark">${{ number_format($totalBilled, 2) }}</h3>
+                    <h3 class="fw-bold mb-0 text-dark">@currency($totalBilled)</h3>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
                 </div>
                 <div>
                     <h6 class="text-secondary fw-semibold mb-1 fs-7">Average Invoice Total</h6>
-                    <h3 class="fw-bold mb-0 text-dark">${{ number_format($averageInvoice, 2) }}</h3>
+                    <h3 class="fw-bold mb-0 text-dark">@currency($averageInvoice)</h3>
                 </div>
             </div>
         </div>
@@ -94,7 +94,7 @@
                                 <span class="fs-8 text-secondary">{{ $invoice->period_from->format('M d') }} - {{ $invoice->period_to->format('M d, Y') }}</span>
                             </td>
                             <td>
-                                <span class="fw-bold text-dark">${{ number_format($invoice->total, 2) }}</span>
+                                <span class="fw-bold text-dark">@currency($invoice->total)</span>
                             </td>
                             <td>
                                 @if($invoice->version > 1)

@@ -60,32 +60,20 @@
                                 @endif
                             </td>
                             <td class="text-end">
-                                <div class="dropdown">
-                                    <button class="btn btn-light btn-sm border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                                        <li>
-                                            <a class="dropdown-item py-2 text-primary" href="{{ route('templates.preview', $template->slug) }}" target="_blank">
-                                                <i class="fas fa-external-link-alt fa-fw me-2"></i>Live Dynamic Demo
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item py-2" href="{{ route('templates.edit', $template) }}">
-                                                <i class="fas fa-edit fa-fw me-2 text-warning"></i>Edit Configuration
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form action="{{ route('templates.destroy', $template) }}" method="POST" onsubmit="return confirm('Are you sure you want to deactivate/delete this template?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item py-2 text-danger">
-                                                    <i class="fas fa-trash-alt fa-fw me-2"></i>Deactivate / Delete
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
+                                <div class="d-inline-flex gap-1">
+                                    <a href="{{ route('templates.preview', $template->slug) }}" target="_blank" class="btn btn-sm bg-success-soft text-success" title="Live Dynamic Demo">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <a href="{{ route('templates.edit', $template) }}" class="btn btn-sm bg-warning-soft text-warning" title="Edit Configuration">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('templates.destroy', $template) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to deactivate/delete this template?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm bg-danger-soft text-danger" title="Deactivate / Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

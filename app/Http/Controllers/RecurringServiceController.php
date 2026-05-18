@@ -104,4 +104,75 @@ class RecurringServiceController extends Controller
         return redirect()->route('companies.show', $company_id)
             ->with('success', 'Recurring service scheduling removed successfully.');
     }
+
+    public function previewNextInvoice(RecurringService $service)
+    {
+        $service->load(['company', 'invoiceStructureTemplate', 'pendingInvoiceLines' => function ($query) {
+            $query->where('billing_status', 'pending');
+        }]);
+
+        $today = \Carbon\Carbon::parse($service->next_billing_date);
+        $periodFrom = clone $today;
+        $periodTo = clone $periodFrom;
+
+        if ($service->recurring_cadence === 'month') {
+            $periodTo->addMonth()->subDay();
+        } elseif ($service->recurring_cadence === '6_months') {
+            $periodTo->addMonths(6)->subDay();
+        } elseif ($service->recurring_cadence === 'year') {
+            $periodTo->addYear()->subDay();
+        }
+
+        if ($periodTo->gt($service->to_date)) {
+            $periodTo = \Carbon\Carbon::parse($service->to_date);
+        }
+
+        $invoiceNumber = "QB-PREVIEW-" . str_pad($service->id, 4, '0', STR_PAD_LEFT);
+
+        // Build simulated line items list
+        $items = [];
+
+        // 1. Base cost
+        $items[] = (object)[
+            'description' => "{$service->name} (Base Subscription)",
+            'amount' => $service->base_cost,
+            'is_adhoc' => false
+        ];
+
+        // 2. Includes lines
+        $includesLines = explode("\n", $service->invoice_includes);
+        foreach ($includesLines as $line) {
+            $trimmedLine = trim($line);
+            if (!empty($trimmedLine)) {
+                $items[] = (object)[
+                    'description' => $trimmedLine,
+                    'amount' => 0.00,
+                    'is_adhoc' => false
+                ];
+            }
+        }
+
+        // 3. Pending adjustments
+        foreach ($service->pendingInvoiceLines as $adj) {
+            $items[] = (object)[
+                'description' => $adj->description . " (Ad-hoc Adjustment)",
+                'amount' => $adj->amount,
+                'is_adhoc' => true
+            ];
+        }
+
+        // Roll up totals
+        $subtotal = collect($items)->sum('amount');
+        $total = $subtotal;
+
+        return view('services.preview_invoice', compact(
+            'service',
+            'periodFrom',
+            'periodTo',
+            'invoiceNumber',
+            'items',
+            'subtotal',
+            'total'
+        ));
+    }
 }

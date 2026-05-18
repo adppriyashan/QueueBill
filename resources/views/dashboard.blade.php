@@ -53,7 +53,7 @@
                 </div>
                 <div>
                     <h6 class="text-secondary fw-semibold mb-1 fs-7">Aggregate Invoiced</h6>
-                    <h3 class="fw-bold mb-0 text-dark">${{ number_format($totalInvoiced, 2) }}</h3>
+                    <h3 class="fw-bold mb-0 text-dark">@currency($totalInvoiced)</h3>
                 </div>
             </div>
         </div>
@@ -136,7 +136,7 @@
                                         <span class="fw-semibold text-dark">{{ $service->next_billing_date->format('M d, Y') }}</span>
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-dark">${{ number_format($service->base_cost, 2) }}</span>
+                                        <span class="fw-bold text-dark">@currency($service->base_cost)</span>
                                     </td>
                                 </tr>
                             @empty
@@ -183,7 +183,7 @@
                                         <a href="{{ route('companies.show', $invoice->company) }}" class="text-secondary text-decoration-none hover-primary">{{ $invoice->company->name }}</a>
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-dark">${{ number_format($invoice->total, 2) }}</span>
+                                        <span class="fw-bold text-dark">@currency($invoice->total)</span>
                                     </td>
                                     <td>
                                         @if($invoice->version > 1)

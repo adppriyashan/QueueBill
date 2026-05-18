@@ -79,4 +79,46 @@ class HomeController extends Controller
             ->with('error', 'Simulation failed with exit code: ' . $exitCode)
             ->with('cron_output', $output);
     }
+
+    public function settings()
+    {
+        $user = auth()->user();
+        return view('settings', compact('user'));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'currency' => ['required', 'string', 'max:10'],
+        ]);
+
+        $user = auth()->user();
+        $user->update([
+            'currency' => $validated['currency']
+        ]);
+
+        return redirect()->route('settings')->with('success', 'System settings updated successfully!');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $updateData = [
+            'name' => $validated['name'],
+        ];
+
+        if (!empty($validated['password'])) {
+            $updateData['password'] = \Illuminate\Support\Facades\Hash::make($validated['password']);
+        }
+
+        $user->update($updateData);
+
+        return redirect()->route('settings')->with('success', 'Profile and password updated successfully!');
+    }
 }

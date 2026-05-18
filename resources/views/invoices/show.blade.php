@@ -165,9 +165,9 @@
                                     <td class="text-center text-secondary">1</td>
                                     <td class="text-end fw-bold text-dark">
                                         @if($item->amount < 0)
-                                            <span class="text-success">-${{ number_format(abs($item->amount), 2) }}</span>
+                                            <span class="text-success">-@currency(abs($item->amount))</span>
                                         @else
-                                            ${{ number_format($item->amount, 2) }}
+                                            @currency($item->amount)
                                         @endif
                                     </td>
                                 </tr>
@@ -181,11 +181,11 @@
                     <div class="col-12 col-md-5">
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span class="text-secondary fw-semibold">Subtotal:</span>
-                            <span class="fw-bold text-dark">${{ number_format($invoice->subtotal, 2) }}</span>
+                            <span class="fw-bold text-dark">@currency($invoice->subtotal)</span>
                         </div>
                         <div class="d-flex justify-content-between py-3 border-bottom fs-6">
                             <span class="text-dark fw-bold">Total Amount Due:</span>
-                            <span class="fw-extrabold text-theme-price fs-4 fw-bold">${{ number_format($invoice->total, 2) }}</span>
+                            <span class="fw-extrabold text-theme-price fs-4 fw-bold">@currency($invoice->total)</span>
                         </div>
                         <div class="mt-4">
                             <span class="text-muted fs-8 font-italic">"Your Recurring Revenue, Perfectly Aligned."</span>
@@ -323,7 +323,7 @@
 
                     <!-- Amount -->
                     <div class="mb-4">
-                        <label for="retro_amount" class="form-label text-secondary fw-semibold fs-8">Financial Adjustment Amount ($) <span class="text-danger">*</span></label>
+                        <label for="retro_amount" class="form-label text-secondary fw-semibold fs-8">Financial Adjustment Amount (@currencySymbol) <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" class="form-control form-control-sm @error('amount') is-invalid @enderror" id="retro_amount" name="amount" required placeholder="0.00">
                         @error('amount')
                             <div class="invalid-feedback">{{ $message }}</div>

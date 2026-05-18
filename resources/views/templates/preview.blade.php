@@ -177,7 +177,7 @@
                                     <small class="text-muted">Calculated decimal pricing engine</small>
                                 </td>
                                 <td class="text-center text-secondary">1</td>
-                                <td class="text-end fw-bold text-dark">$199.00</td>
+                                <td class="text-end fw-bold text-dark">@currencySymbol()199.00</td>
                             </tr>
                             <tr>
                                 <td>
@@ -185,7 +185,7 @@
                                     <small class="text-muted">Scope details list parsed from configuration</small>
                                 </td>
                                 <td class="text-center text-secondary">1</td>
-                                <td class="text-end fw-bold text-dark">$0.00</td>
+                                <td class="text-end fw-bold text-dark">@currencySymbol()0.00</td>
                             </tr>
                             <tr>
                                 <td>
@@ -193,7 +193,7 @@
                                     <small class="text-muted">Injected prior-to-billing adhoc item</small>
                                 </td>
                                 <td class="text-center text-secondary">1</td>
-                                <td class="text-end fw-bold text-dark">$50.00</td>
+                                <td class="text-end fw-bold text-dark">@currencySymbol()50.00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -204,11 +204,11 @@
                     <div class="col-12 col-md-5">
                         <div class="d-flex justify-content-between py-2 border-bottom fs-7">
                             <span class="text-secondary fw-semibold">Subtotal:</span>
-                            <span class="fw-bold text-dark">$249.00</span>
+                            <span class="fw-bold text-dark">@currencySymbol()249.00</span>
                         </div>
                         <div class="d-flex justify-content-between py-3 border-bottom fs-6">
                             <span class="text-dark fw-bold">Total Amount Due:</span>
-                            <span class="fw-extrabold text-theme fs-4 fw-bold">$249.00</span>
+                            <span class="fw-extrabold text-theme fs-4 fw-bold">@currencySymbol()249.00</span>
                         </div>
                         <div class="mt-4">
                             <span class="text-muted fs-8 font-italic">"Your Recurring Revenue, Perfectly Aligned."</span>

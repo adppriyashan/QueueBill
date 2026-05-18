@@ -59,9 +59,9 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-column">
-                                    <span class="fw-bold text-dark">${{ number_format($service->base_cost, 2) }}</span>
-                                    <span class="badge bg-primary-soft text-primary text-capitalize fs-8 mt-1" style="max-width: fit-content;">Every {{ $service->recurring_cadence }}</span>
-                                </div>
+                                     <span class="fw-bold text-dark">@currency($service->base_cost)</span>
+                                     <span class="badge bg-primary-soft text-primary text-capitalize fs-8 mt-1" style="max-width: fit-content;">Every {{ $service->recurring_cadence }}</span>
+                                 </div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -84,32 +84,20 @@
                                 @endif
                             </td>
                             <td class="text-end">
-                                <div class="dropdown">
-                                    <button class="btn btn-light btn-sm border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                                        <li>
-                                            <a class="dropdown-item py-2" href="{{ route('services.show', $service) }}">
-                                                <i class="fas fa-cog fa-fw me-2 text-primary"></i>Config adjustments
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item py-2" href="{{ route('services.edit', $service) }}">
-                                                <i class="fas fa-edit fa-fw me-2 text-warning"></i>Edit Schedule
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form action="{{ route('services.destroy', $service) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this scheduled subscription?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item py-2 text-danger">
-                                                    <i class="fas fa-trash-alt fa-fw me-2"></i>Delete Schedule
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
+                                <div class="d-inline-flex gap-1">
+                                    <a href="{{ route('services.show', $service) }}" class="btn btn-sm bg-primary-soft text-primary" title="Config Adjustments">
+                                        <i class="fas fa-cog"></i>
+                                    </a>
+                                    <a href="{{ route('services.edit', $service) }}" class="btn btn-sm bg-warning-soft text-warning" title="Edit Schedule">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('services.destroy', $service) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to remove this scheduled subscription?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm bg-danger-soft text-danger" title="Delete Schedule">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

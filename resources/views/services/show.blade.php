@@ -49,7 +49,7 @@
                             <div class="col-6">
                                 <label class="text-muted fs-8 text-uppercase fw-semibold d-block">Base Price</label>
                                 <span
-                                    class="fw-extrabold text-primary fs-5 fw-bold">${{ number_format($service->base_cost, 2) }}</span>
+                                    class="fw-extrabold text-primary fs-5 fw-bold">@currency($service->base_cost)</span>
                             </div>
                         </div>
 
@@ -109,16 +109,20 @@
                     </div>
                 </div>
 
-                <div class="card-footer bg-light border-top p-3 d-flex gap-2">
-                    <a href="{{ route('services.edit', $service) }}" class="btn btn-warning btn-sm flex-grow-1"><i
-                            class="fas fa-edit me-1"></i>Edit Parameters</a>
-                    <form action="{{ route('services.destroy', $service) }}" method="POST" class="flex-grow-1"
-                        onsubmit="return confirm('Are you sure you want to remove this contract schedule?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm w-100"><i
-                                class="fas fa-trash-alt me-1"></i>Delete Contract</button>
-                    </form>
+                <div class="card-footer bg-light border-top p-3 d-flex flex-column gap-2">
+                    <a href="{{ route('services.preview-next-invoice', $service) }}" class="btn btn-primary btn-sm w-100 py-2 fw-semibold"><i
+                            class="fas fa-file-invoice-dollar me-2"></i>Preview Next Statement</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('services.edit', $service) }}" class="btn btn-warning btn-sm flex-grow-1"><i
+                                class="fas fa-edit me-1"></i>Edit Parameters</a>
+                        <form action="{{ route('services.destroy', $service) }}" method="POST" class="flex-grow-1"
+                            onsubmit="return confirm('Are you sure you want to remove this contract schedule?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm w-100"><i
+                                    class="fas fa-trash-alt me-1"></i>Delete Contract</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -150,7 +154,7 @@
                                     required placeholder="e.g. Migration Setup Credit or Server Overage Fee">
                             </div>
                             <div class="col-12 col-md-3">
-                                <label for="amount" class="form-label fs-8 text-secondary fw-semibold">Amount ($) <span
+                                <label class="text-muted fs-8 text-uppercase fw-semibold d-block">Amount (@currencySymbol) <span
                                         class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control form-control-sm" id="amount"
                                     name="amount" required placeholder="0.00">
@@ -186,10 +190,10 @@
                                         </td>
                                         <td>
                                             @if($line->amount < 0)
-                                                <span class="text-success fw-bold">-${{ number_format(abs($line->amount), 2) }}
+                                                <span class="text-success fw-bold">-@currency(abs($line->amount))
                                                     (Credit)</span>
                                             @else
-                                                <span class="text-danger fw-bold">+${{ number_format($line->amount, 2) }}
+                                                <span class="text-danger fw-bold">+@currency($line->amount)
                                                     (Overage)</span>
                                             @endif
                                         </td>
@@ -252,7 +256,7 @@
                                                 {{ $invoice->period_to->format('M d, Y') }}</span>
                                         </td>
                                         <td>
-                                            <span class="fw-bold text-dark">${{ number_format($invoice->total, 2) }}</span>
+                                            <span class="fw-bold text-dark">@currency($invoice->total)</span>
                                         </td>
                                         <td>
                                             @if($invoice->version > 1)

@@ -96,8 +96,8 @@ class InvoiceController extends Controller
             'recipient' => $invoice->company->email,
             'subject' => "REVISED STATEMENT (v{$newVersion}) for Invoice {$invoice->invoice_number}",
             'body' => "Hello Customer, please find attached the Revised Statement (version {$newVersion}) for Invoice {$invoice->invoice_number}.\n\n" .
-                      "Reason for Revision: Added retroactive item: {$validated['description']} ({$validated['amount']}).\n" .
-                      "New Total Due: $" . number_format($newTotal, 2),
+                      "Reason for Revision: Added retroactive item: {$validated['description']} (" . currency_symbol() . number_format($validated['amount'], 2) . ").\n" .
+                      "New Total Due: " . currency_symbol() . number_format($newTotal, 2),
             'status' => 'sent'
         ]);
 

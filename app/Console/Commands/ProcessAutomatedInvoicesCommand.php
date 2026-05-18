@@ -138,13 +138,15 @@ class ProcessAutomatedInvoicesCommand extends Command
             ]);
 
             // 8. Simulated Email Broadcast dispatch
+            $creator = \App\Models\User::find($service->created_by);
+            $currency = $creator->currency ?? '$';
             $senderEmail = $service->invoiceStructureTemplate->sender_email ?? 'billing@queuebill.com';
             EmailLog::create([
                 'invoice_id' => $invoice->id,
                 'sender' => $senderEmail,
                 'recipient' => $service->company->email,
                 'subject' => "New Statement Generated: {$invoiceNumber} - QueueBill",
-                'body' => "Dear Customer,\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nTotal Due: $" . number_format($subtotal, 2) . "\n\nRegards,\nAcme Global Services.",
+                'body' => "Dear Customer,\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nRegards,\nAcme Global Services.",
                 'status' => 'sent'
             ]);
 

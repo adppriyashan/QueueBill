@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
 
     // Module 3: Recurring Service Scheduling Configurations (CRUD)
     Route::resource('services', RecurringServiceController::class);
+    Route::get('/services/{service}/preview-next-invoice', [RecurringServiceController::class, 'previewNextInvoice'])->name('services.preview-next-invoice');
 
     // Module 4: Pre-emptive Manual Item Adjustments
     Route::post('/services/{service}/adjustments', [InvoiceController::class, 'storeAdjustment'])->name('services.adjustments.store');
@@ -50,4 +51,9 @@ Route::middleware('auth')->group(function () {
 
     // Sandbox Trigger for Cron
     Route::post('/sandbox/process-cron', [HomeController::class, 'triggerCron'])->name('sandbox.cron');
+
+    // System Settings: Currency Configurations
+    Route::get('/settings', [HomeController::class, 'settings'])->name('settings');
+    Route::post('/settings', [HomeController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/profile', [HomeController::class, 'updateProfile'])->name('settings.profile.update');
 });
