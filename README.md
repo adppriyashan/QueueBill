@@ -1,59 +1,77 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# QueueBill
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> **"Your Recurring Revenue, Perfectly Aligned."**
 
-## About Laravel
+QueueBill is a B2B subscription scheduling and automated billing engine built on Laravel. It empowers enterprise software systems, cloud providers, and SaaS lines of business to configure customer directories, construct branded dynamic invoice templates, run hands-free periodic cycle rollups, and manage ad-hoc adjustments cleanly.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Features & Design Highlights
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+*   **🛡️ Administrative Authentication**: Custom center-screen glassmorphic login and registration panels.
+*   **📂 Company Profile Directory (CRUD)**: Manage buyer credentials with strict international phone formatting checks (`+1 (555) 000-0000`) and a comprehensive **Historical Billing Profile** showing cumulative invoiced revenue, active billing schedules, and ledger histories.
+*   **🎨 Dynamic Invoice Structure Templates**: Configure distinct layout brand identities (SaaS hosting templates, consultancy invoices, marketing templates) with fallback sender emails and real-time JavaScript alphanumeric URL slug auto-generation served dynamically at `/invoices/templates/{slug}`.
+*   **📅 Recurring Service Scheduling (CRUD)**: Set calendar timeline boundaries, custom scope text lists (which dynamically parse line-by-line into independent $0.00 items on the statement breakdown), base pricing intervals, and target **Google Drive Upload Folders** registered on creation.
+*   **⚡ Scenario A: Pre-emptive Manual Injections**: Inject manual credit or fee lines prior to cycle executions. These are stored in a queue and automatically integrated into the statement breakdown when the automated cycle scheduler runs.
+*   **🔄 Scenario B: Retroactive Adjustments & Version Control**: Perform post-billing statement revisions. Inject retroactive charges on an issued invoice to automatically increment document versions (`v1 ➔ v2 ➔ v3`), recalculate subtotals, append a "REVISED STATEMENT" badge, log simulated dispatch emails, and upload simulated revision PDFs to the registered Google Drive path.
+*   **⚙️ Midnight Cron Billing Runner**: Robust console Artisan task processing active schedules, advancing calendars, rolls up subtotals, logs simulated dispatches in `email_logs`, and logs simulated Google Drive file uploads in `google_drive_logs`.
+*   **📊 Console Cockpit Dashboard**: View high-level metrics, active schedules, generated ledger statements, and run manual sandbox tick billing runs from a single unified workspace.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🛠️ Technical Specifications
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Detailed design architecture and requirements are fully specified in the `docs/` folder:
+*   [docs/requirements.md](docs/requirements.md) — Detailed feature bounds and scenarios.
+*   [docs/structure.md](docs/structure.md) — Model schemas, traits, relationships, and directory tree maps.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## 🚀 Quick Start Guide
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Verify or boot the platform environment on your system using these steps:
+
+### 1. Requirements & Prerequisites
+*   PHP 8.2+
+*   Composer
+*   SQLite3
+
+### 2. Configure Local Database
+Clone the repository, copy environment parameters, and run pristine database migrations and seeders:
 
 ```bash
-composer require laravel/boost --dev
+# Install package dependencies
+composer install
 
-php artisan boost:install
+# Copy configuration
+cp .env.example .env
+
+# Create empty SQLite database file
+touch database/database.sqlite
+
+# Run database migrations and seed default administrative/testing profiles
+php artisan migrate:fresh --seed
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Launch Development Server
+```bash
+# Start local PHP dev server
+php artisan serve --port=8000
+```
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your web browser.
 
-## Contributing
+### 4. Admin Sign-In Credentials
+*   **Email**: `admin@queuebill.com`
+*   **Password**: `password`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🕹️ Interactive Simulation Sandbox
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# QueueBill
+To perform cycle billing simulation runs:
+1.  Sign in to the administrative portal.
+2.  Navigate to the **Dashboard** ("Administrative Console").
+3.  Fill in the **Simulation Sandbox** form on the top right:
+    *   Set simulation date to `2026-05-18` (which is already populated).
+    *   Click **Tick Midnight Cron Run**.
+4.  Observe the processed outputs and generated statements directly in the logs and invoice lists!
