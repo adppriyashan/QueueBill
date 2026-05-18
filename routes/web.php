@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::post('/invoices/{invoice}/revise', [InvoiceController::class, 'revise'])->name('invoices.revise');
+    Route::post('/invoices/{invoice}/resend', [InvoiceController::class, 'resendEmail'])->name('invoices.resend');
 
     // Activity Logs Viewer (Email Logs & Google Drive Uploads)
     Route::get('/logs', [HomeController::class, 'logs'])->name('logs.index');

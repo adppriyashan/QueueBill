@@ -146,8 +146,8 @@ class ProcessAutomatedInvoicesCommand extends Command
             // Load relations for PDF rendering context
             $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems', 'creator']);
 
-            // Generate PDF statement
-            $pdf = Pdf::loadView('invoices.show', compact('invoice'));
+            // Generate PDF statement using the clean, dedicated PDF view
+            $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
             $pdfData = $pdf->output();
             $pdfFilename = "{$invoiceNumber}_v1.pdf";
 

@@ -399,6 +399,14 @@
             <button onclick="window.print()" class="btn btn-primary w-100 py-2.5 fw-semibold fs-7 mb-2 rounded-3 shadow-sm">
                 <i class="fas fa-print me-2"></i>Print Statement Sheet
             </button>
+            
+            <form method="POST" action="{{ route('invoices.resend', $invoice) }}" class="w-100">
+                @csrf
+                <button type="submit" class="btn btn-success w-100 py-2.5 fw-semibold fs-7 mb-2 rounded-3 shadow-sm">
+                    <i class="far fa-envelope me-2"></i>Resend Statement Email
+                </button>
+            </form>
+
             <a href="{{ route('companies.show', $invoice->company) }}" class="btn btn-light border w-100 py-2 fs-7 rounded-3 text-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Return to Profile
             </a>

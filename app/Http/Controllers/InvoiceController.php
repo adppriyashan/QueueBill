@@ -106,8 +106,8 @@ class InvoiceController extends Controller
         // Load relations for PDF rendering context
         $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems', 'creator']);
 
-        // Generate PDF
-        $pdf = Pdf::loadView('invoices.show', compact('invoice'));
+        // Generate PDF using the clean, dedicated PDF view
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
         $pdfData = $pdf->output();
         $pdfFilename = "{$invoice->invoice_number}_v{$newVersion}.pdf";
 
@@ -176,5 +176,53 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', $successMsg);
+    }
+
+    public function resendEmail(Invoice $invoice)
+    {
+        // 1. Gather context
+        $creator = $invoice->creator;
+        $senderCompany = $creator->company_name ?? 'QueueBill Automation System';
+        $senderEmail = $invoice->recurringService?->invoiceStructureTemplate?->sender_email ?? 'billing@queuebill.com';
+        $currency = $creator->currency ?? '$';
+
+        $subjectText = "STATEMENT DISPATCH: Invoice {$invoice->invoice_number}";
+        $bodyText = "Dear {$invoice->company->name},\n\n" .
+                    "Please find attached your Statement for Invoice {$invoice->invoice_number}.\n\n" .
+                    "Total Amount Due: " . $currency . number_format($invoice->total, 2) . "\n\n" .
+                    "Warm Regards,\n{$senderCompany}.";
+
+        // Load relations for PDF rendering context
+        $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems', 'creator']);
+
+        // Generate PDF using the clean, dedicated PDF view
+        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
+        $pdfData = $pdf->output();
+        $pdfFilename = "{$invoice->invoice_number}_v{$invoice->version}.pdf";
+
+        $emailStatus = 'failed';
+        try {
+            Mail::to($invoice->company->email)->send(new InvoiceStatementMail($subjectText, $bodyText, $pdfData, $pdfFilename));
+            $emailStatus = 'sent';
+        } catch (\Exception $e) {
+            // failed, status logged below
+        }
+
+        EmailLog::create([
+            'invoice_id' => $invoice->id,
+            'sender' => $senderEmail,
+            'recipient' => $invoice->company->email,
+            'subject' => $subjectText,
+            'body' => $bodyText,
+            'status' => $emailStatus
+        ]);
+
+        if ($emailStatus === 'sent') {
+            return redirect()->route('invoices.show', $invoice)
+                ->with('success', "Statement email successfully resent to {$invoice->company->email}!");
+        }
+
+        return redirect()->route('invoices.show', $invoice)
+            ->with('error', "Failed to resend statement email. Please check configuration/logs.");
     }
 }
