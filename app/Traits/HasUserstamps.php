@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 trait HasUserstamps
 {
@@ -22,5 +23,13 @@ trait HasUserstamps
                 $model->updated_by = Auth::id();
             }
         });
+
+        // Apply strict B2B multi-tenant user data isolation
+        static::addGlobalScope('user_isolation', function (Builder $builder) {
+            if (Auth::check()) {
+                $builder->where($builder->getModel()->getTable() . '.created_by', Auth::id());
+            }
+        });
     }
 }
+

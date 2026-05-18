@@ -40,8 +40,15 @@ class HomeController extends Controller
 
     public function logs()
     {
-        $emailLogs = EmailLog::with('invoice.company')->latest()->paginate(10, ['*'], 'emails');
-        $driveLogs = GoogleDriveLog::with('invoice.company')->latest()->paginate(10, ['*'], 'drive');
+        $emailLogs = EmailLog::whereHas('invoice')
+            ->with('invoice.company')
+            ->latest()
+            ->paginate(10, ['*'], 'emails');
+            
+        $driveLogs = GoogleDriveLog::whereHas('invoice')
+            ->with('invoice.company')
+            ->latest()
+            ->paginate(10, ['*'], 'drive');
 
         return view('logs.index', compact('emailLogs', 'driveLogs'));
     }
