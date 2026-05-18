@@ -90,14 +90,20 @@ class InvoiceController extends Controller
 
         // 4. Log simulated email dispatch (Revised Statement)
         $senderEmail = $invoice->recurringService?->invoiceStructureTemplate?->sender_email ?? 'billing@queuebill.com';
+        $creator = auth()->user() ?? \App\Models\User::first();
+        $senderCompany = $creator ? $creator->company_name : 'QueueBill Automation System';
+
+        $bodyText = "Dear {$invoice->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\n" .
+                    "Please find attached the Revised Statement (version {$newVersion}) for Invoice {$invoice->invoice_number}.\n\n" .
+                    "Reason for Revision: Added retroactive item: {$validated['description']} (" . currency_symbol() . number_format($validated['amount'], 2) . ").\n" .
+                    "New Total Due: " . currency_symbol() . number_format($newTotal, 2) . "\n\nWarm Regards,\n{$senderCompany}.";
+
         EmailLog::create([
             'invoice_id' => $invoice->id,
             'sender' => $senderEmail,
             'recipient' => $invoice->company->email,
             'subject' => "REVISED STATEMENT (v{$newVersion}) for Invoice {$invoice->invoice_number}",
-            'body' => "Hello Customer, please find attached the Revised Statement (version {$newVersion}) for Invoice {$invoice->invoice_number}.\n\n" .
-                      "Reason for Revision: Added retroactive item: {$validated['description']} (" . currency_symbol() . number_format($validated['amount'], 2) . ").\n" .
-                      "New Total Due: " . currency_symbol() . number_format($newTotal, 2),
+            'body' => $bodyText,
             'status' => 'sent'
         ]);
 
