@@ -1,0 +1,67 @@
+# QueueBill - Requirements Specification
+
+**Tagline**: *"Your Recurring Revenue, Perfectly Aligned."*
+
+QueueBill is a premium B2B subscription billing engine engineered in Laravel. It handles complex periodic cycles, line-by-line scope parsing, pre-emptive ad-hoc injections, and retroactive version-controlled revisions while maintaining simulated email and Google Drive upload audit trails.
+
+---
+
+## Core System Modules
+
+### Module 1: Company Directory Management (CRUD)
+* **Validation Engine**:
+  * `name`: Required, String, Max 255.
+  * `email`: Required, Valid Email format, Unique except current record.
+  * `phone`: Optional, standard local or international phone format validation (`+1 (555) 000-0000`).
+  * `address`: Optional, Text.
+* **User Interface**: Clean B2B tabular list featuring company status metrics (Total, Active vs Inactive counts), status toggling, and inline details link to view client history.
+* **Historical Billing Profile**: A centralized detail page highlighting company metadata, a list of active service schedules, and a chronological statement ledger showing invoice numbers, issuance dates, amounts, and active versions.
+
+### Module 2: Dynamic Invoice Structure Templates
+Allows the business to format individual distinct looks for different services, brands, or lines of business.
+* **Attributes**:
+  * `title`: Admin template identifier.
+  * `slug`: Alphanumeric parameter generated in real-time from the title via JavaScript. Custom layouts are served dynamically at `/invoices/templates/{slug}`.
+  * `sender_email`: Fallback system broadcast override field. If populated, outgoing invoice simulated emails declare this as the sender; otherwise, defaults to standard system profile.
+
+### Module 3: Recurring Service Scheduling Configurations (CRUD)
+Manages the parameters under which billing schedules operate.
+* **Attributes**:
+  * **Relational Mapping**: Binds a specific Company to a dynamic Invoice Structure Template.
+  * **Timeline Boundaries**: Start date (`from_date`) and end date (`to_date`) with validation ensuring `to_date >= from_date`.
+  * **Base Price**: Base contract price decimal format.
+  * **Recurring Cadence**: Cadences supporting `month`, `6_months`, or `year` intervals.
+  * **Scope Text Block**: Multi-line text field (`invoice_includes`) where each line is dynamically parsed into independent $0.00 line items on generated invoice statements.
+  * **Google Drive Target Path**: Registers a custom upload path (e.g. `/QueueBill/Drive/AcmeCorp`) at the time of schedule creation for automated statement storage.
+
+### Module 4: Dynamic Ad-Hoc Adjustments Engine
+Handles out-of-band balance adjustments in two scenarios:
+
+#### Scenario A: Pre-emptive Manual Adjustments
+* Admins can inject one-off fees (positive) or credits/discounts (negative) into a service's pending line queue *before* the next billing cycle runs.
+* Injections are queued in `pending_invoice_lines` table.
+* When the automated scheduler executes, it automatically harvests all pending lines for that service, stacks them as itemized rows, links them to the new invoice, and sets their billing status to `invoiced`.
+
+#### Scenario B: Retroactive Adjustments & Resend
+* Post-billing statement revisions. Admins can open an already-issued invoice and inject retroactive line items.
+* Doing so automatically:
+  1. Increments the statement document version index by 1 (e.g. `v1 -> v2`).
+  2. Appends the new item to the invoice breakdown with `is_adhoc = true`.
+  3. Recalculates the subtotal and total decimals.
+  4. Triggers a simulated revised statement email logged in `email_logs`.
+  5. Uploads a simulated statement file (`{invoice_number}_v{version}.pdf`) to the registered Google Drive path, logged in `google_drive_logs`.
+
+### Module 5: Automated Invoicing Dispatcher Engine (Midnight Cron Command)
+* Run via Artisan console: `php artisan queuebill:process-invoices`.
+* Automatically scheduled at daily midnight.
+* **Workflow**:
+  1. Queries all active billing schedules where `next_billing_date <= CURRENT_DATE`.
+  2. Recomputes start and end bounds based on the recurring cadence.
+  3. Compiles a unique invoice number: `QB-YYYYMMDD-XXXX`.
+  4. Generates a base item for the base contract price.
+  5. Parses the multi-line scope block line-by-line into individual $0.00 items.
+  6. Intercepts and attaches all pending Scenario A ad-hoc adjustments.
+  7. Conducts decimal rollups for subtotals and totals.
+  8. Advances the schedule's `next_billing_date` by the cadence interval.
+  9. Fires simulated email dispatches and target Google Drive sync transactions.
+  10. Spits out clear CLI console execution details.
