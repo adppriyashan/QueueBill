@@ -2,9 +2,8 @@
 
 namespace App\Providers {
 
-    use Illuminate\Support\ServiceProvider;
     use Illuminate\Support\Facades\Blade;
-    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\ServiceProvider;
 
     class AppServiceProvider extends ServiceProvider
     {
@@ -33,19 +32,25 @@ namespace App\Providers {
 }
 
 namespace {
-    if (!function_exists('currency_symbol')) {
-        function currency_symbol($userId = null) {
+    use App\Models\User;
+
+    if (! function_exists('currency_symbol')) {
+        function currency_symbol($userId = null)
+        {
             if ($userId) {
-                $user = \App\Models\User::find($userId);
+                $user = User::find($userId);
+
                 return $user->currency ?? '$';
             }
+
             return auth()->check() ? auth()->user()->currency ?? '$' : '$';
         }
     }
 
-    if (!function_exists('format_currency')) {
-        function format_currency($amount, $userId = null) {
-            return currency_symbol($userId) . number_format($amount, 2);
+    if (! function_exists('format_currency')) {
+        function format_currency($amount, $userId = null)
+        {
+            return currency_symbol($userId).number_format($amount, 2);
         }
     }
 }
