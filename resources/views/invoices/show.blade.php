@@ -1,0 +1,354 @@
+@extends('layouts.app')
+
+@section('title', 'Invoice Details: ' . $invoice->invoice_number . ' - QueueBill')
+@section('page_title', 'Invoice Details: ' . $invoice->invoice_number)
+
+@section('styles')
+<style>
+    /* Premium Invoice Sheet Card styling */
+    .invoice-sheet {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Branded Header bar customized dynamically by Template rules */
+    .sheet-header-bar {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: #ffffff;
+        padding: 35px;
+    }
+
+    @php
+        $templateTitle = $invoice->recurringService?->invoiceStructureTemplate?->title ?? '';
+        $isHosting = str_contains(strtolower($templateTitle), 'hosting') || str_contains(strtolower($templateTitle), 'cloud');
+        $isCorp = str_contains(strtolower($templateTitle), 'corporate') || str_contains(strtolower($templateTitle), 'enterprise');
+    @endphp
+
+    @if($isHosting)
+    .sheet-header-bar {
+        background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    }
+    .text-theme-price {
+        color: #06b6d4 !important;
+    }
+    @elseif($isCorp)
+    .sheet-header-bar {
+        background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    }
+    .text-theme-price {
+        color: #1e293b !important;
+    }
+    @else
+    .text-theme-price {
+        color: #4f46e5 !important;
+    }
+    @endif
+
+    .sheet-body {
+        padding: 35px;
+    }
+
+    .table-sheet-items th {
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: #64748b;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 10px;
+    }
+
+    .table-sheet-items td {
+        padding: 14px 10px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+    }
+
+    .sheet-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        padding: 4px 12px;
+        border-radius: 50rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+        backdrop-filter: blur(8px);
+    }
+</style>
+@endsection
+
+@section('content')
+<div class="row g-4">
+    <!-- Invoice Sheet and Audits Column -->
+    <div class="col-12 col-lg-8">
+        <div class="invoice-sheet mb-4">
+            <!-- Sheet Header -->
+            <div class="sheet-header-bar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                <div>
+                    @if($invoice->version > 1)
+                        <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-1.5 fs-8 text-uppercase"><i class="fas fa-exclamation-triangle me-1"></i>Revised Statement (v{{ $invoice->version }})</span>
+                    @else
+                        <span class="sheet-badge mb-2 d-inline-block">Standard Statement (v1)</span>
+                    @endif
+                    <h2 class="fw-bold tracking-tight mb-1">Acme Global Services</h2>
+                    <p class="fs-8 mb-0 opacity-75">Layout branded via template: <strong>{{ $invoice->recurringService?->invoiceStructureTemplate?->title ?? 'Default Template' }}</strong></p>
+                </div>
+                <div class="text-md-end">
+                    <h3 class="fw-bold mb-0">INVOICE</h3>
+                    <span class="fs-6 opacity-75">#{{ $invoice->invoice_number }}</span>
+                </div>
+            </div>
+
+            <!-- Sheet Body -->
+            <div class="sheet-body">
+                <!-- Meta Rows -->
+                <div class="row g-4 mb-5 fs-7">
+                    <div class="col-12 col-md-4">
+                        <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed From</h6>
+                        <strong class="text-dark d-block">QueueBill Automation System</strong>
+                        <span class="text-muted d-block">100 Revenue Way, Suite A</span>
+                        <span class="text-muted d-block">Austin, TX 78701</span>
+                        
+                        <!-- Custom Fallback Email overridden via template properties -->
+                        <span class="text-primary fw-medium d-block mt-2">
+                            <i class="far fa-envelope me-1"></i>
+                            @php
+                                $senderEmail = $invoice->recurringService?->invoiceStructureTemplate?->sender_email;
+                            @endphp
+                            @if($senderEmail)
+                                <strong>{{ $senderEmail }}</strong> <small class="text-muted">(Override)</small>
+                            @else
+                                hello@queuebill.com <small class="text-muted">(System Default)</small>
+                            @endif
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed To</h6>
+                        <strong class="text-dark d-block">{{ $invoice->company->name }}</strong>
+                        <span class="text-muted d-block">{{ $invoice->company->address ?? '—' }}</span>
+                        <span class="text-primary fw-medium d-block mt-2">
+                            <i class="far fa-envelope me-1"></i>{{ $invoice->company->email }}
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4 text-md-end">
+                        <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Cycle Timeline</h6>
+                        <div class="mb-1"><strong>Issue Date:</strong> <span class="text-muted">{{ $invoice->issue_date->format('M d, Y') }}</span></div>
+                        <div class="mb-1"><strong>Due Date:</strong> <span class="text-muted">{{ $invoice->due_date->format('M d, Y') }}</span></div>
+                        <div class="mb-1"><strong>Period From:</strong> <span class="text-muted">{{ $invoice->period_from->format('M d, Y') }}</span></div>
+                        <div class="mb-1"><strong>Period To:</strong> <span class="text-muted">{{ $invoice->period_to->format('M d, Y') }}</span></div>
+                    </div>
+                </div>
+
+                <!-- Line Items Table -->
+                <div class="table-responsive mb-5">
+                    <table class="table table-sheet-items mb-0 fs-7">
+                        <thead>
+                            <tr>
+                                <th style="width: 60%">Item Description</th>
+                                <th style="width: 15%" class="text-center">Qty</th>
+                                <th style="width: 25%" class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($invoice->invoiceItems as $item)
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-dark">{{ $item->description }}</div>
+                                        @if($item->is_adhoc)
+                                            <span class="badge bg-warning-soft text-warning fs-9 px-2 py-0.5 mt-1 d-inline-block"><i class="fas fa-plus-circle me-1"></i>Ad-Hoc Line Injection</span>
+                                        @else
+                                            <span class="badge bg-light text-secondary fs-9 px-2 py-0.5 mt-1 d-inline-block">Standard contract scope item</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center text-secondary">1</td>
+                                    <td class="text-end fw-bold text-dark">
+                                        @if($item->amount < 0)
+                                            <span class="text-success">-${{ number_format(abs($item->amount), 2) }}</span>
+                                        @else
+                                            ${{ number_format($item->amount, 2) }}
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals row -->
+                <div class="row justify-content-end text-md-end fs-7">
+                    <div class="col-12 col-md-5">
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <span class="text-secondary fw-semibold">Subtotal:</span>
+                            <span class="fw-bold text-dark">${{ number_format($invoice->subtotal, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-3 border-bottom fs-6">
+                            <span class="text-dark fw-bold">Total Amount Due:</span>
+                            <span class="fw-extrabold text-theme-price fs-4 fw-bold">${{ number_format($invoice->total, 2) }}</span>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-muted fs-8 font-italic">"Your Recurring Revenue, Perfectly Aligned."</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Activity Logs Auditing -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-white border-bottom p-4">
+                <h5 class="fw-bold mb-0">Delivery & Google Drive Transaction logs</h5>
+                <p class="text-secondary mb-0 fs-7">Audits for simulated email dispatch and PDF upload actions generated during revisions.</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <!-- Emails log -->
+                <h6 class="fw-bold text-dark mb-3"><i class="far fa-envelope-open text-primary me-2"></i>Outgoing Email Broadcast History</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered mb-0 align-middle fs-7">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th>Subject</th>
+                                <th>To / From</th>
+                                <th>Timestamp</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse(\App\Models\EmailLog::where('invoice_id', $invoice->id)->latest()->get() as $log)
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-dark">{{ $log->subject }}</div>
+                                        <small class="text-muted d-block text-truncate" style="max-width: 300px;" title="{{ $log->body }}">{{ $log->body }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="fs-8">
+                                            <strong>To:</strong> {{ $log->recipient }}<br>
+                                            <strong>From:</strong> {{ $log->sender }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary fs-8">{{ $log->created_at->format('M d, Y H:i') }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success-soft text-success"><i class="fas fa-check me-1"></i>{{ strtoupper($log->status) }}</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">
+                                        No emails dispatched for this invoice record yet.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Google Drive logs -->
+                <h6 class="fw-bold text-dark mb-3"><i class="fab fa-google-drive text-success me-2"></i>Google Drive Simulated Storage Logs</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0 align-middle fs-7">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th>File Name</th>
+                                <th>Drive Folder Path</th>
+                                <th>Log Details</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse(\App\Models\GoogleDriveLog::where('invoice_id', $invoice->id)->latest()->get() as $log)
+                                <tr>
+                                    <td>
+                                        <strong class="text-dark">{{ $log->file_name }}</strong>
+                                        <span class="text-muted d-block fs-8">{{ $log->created_at->format('M d, Y H:i') }}</span>
+                                    </td>
+                                    <td>
+                                        <code class="text-success">{{ $log->google_drive_path }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary fs-8">{{ $log->details }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success-soft text-success"><i class="fas fa-check me-1"></i>{{ strtoupper($log->status) }}</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">
+                                        No Google Drive uploads occurred for this invoice yet.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Scenario B Retroactive Adjustments Control Form -->
+    <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-white border-bottom p-4">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-3 p-2 bg-warning-soft text-warning me-3">
+                        <i class="fas fa-history fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Scenario B Adjustments</h5>
+                        <p class="text-secondary mb-0 fs-8">Retroactive Post-Billing Revision</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="alert alert-warning border-0 rounded-4 shadow-sm mb-4 fs-8">
+                    <i class="fas fa-exclamation-circle me-1"></i> Adding retroactive manual adjustments here dynamically increments the version indicator (current: <strong>v{{ $invoice->version }}</strong>), recalculates subtotals, compiles a <strong>Revised Statement</strong>, dispatches email logs, and uploads to Google Drive.
+                </div>
+
+                <form method="POST" action="{{ route('invoices.revise', $invoice) }}">
+                    @csrf
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="retro_description" class="form-label text-secondary fw-semibold fs-8">Adjustment Description <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm @error('description') is-invalid @enderror" id="retro_description" name="description" required placeholder="e.g. Retroactive Server Usage Adjustment">
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="mb-4">
+                        <label for="retro_amount" class="form-label text-secondary fw-semibold fs-8">Financial Adjustment Amount ($) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" class="form-control form-control-sm @error('amount') is-invalid @enderror" id="retro_amount" name="amount" required placeholder="0.00">
+                        @error('amount')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text text-muted fs-8">Specify negative numbers for credits/reductions.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 py-2 fw-semibold fs-7"><i class="fas fa-sync-alt me-1"></i>Compile & Resend Revision</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Google Drive Path Info card -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 p-4">
+            <h6 class="fw-bold mb-3"><i class="fab fa-google-drive text-success me-2"></i>Google Drive Settings</h6>
+            <div class="fs-7 text-secondary mb-3">
+                This invoice's target upload folder:
+            </div>
+            <div class="bg-light p-3 rounded border text-break mb-3">
+                <code class="text-success"><i class="fas fa-folder me-1"></i>{{ $invoice->google_drive_path ?? '/QueueBill/Invoices' }}</code>
+            </div>
+            <div class="fs-8 text-muted">
+                <i class="fas fa-info-circle me-1"></i> Drive paths are registered during recurring service scheduling. Any revisions trigger an automatic file sync simulation to this folder.
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
