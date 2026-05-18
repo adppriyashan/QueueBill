@@ -24,8 +24,8 @@
                         <i class="fas fa-sliders-h fa-lg"></i>
                     </div>
                     <div>
-                        <h5 class="fw-bold mb-0">Currency Settings</h5>
-                        <p class="text-secondary mb-0 fs-8">Configure the default monetary symbol utilized throughout the dashboard & invoices.</p>
+                        <h5 class="fw-bold mb-0">System & Company Settings</h5>
+                        <p class="text-secondary mb-0 fs-8">Configure your company identity, addresses, and system-wide default currency symbol.</p>
                     </div>
                 </div>
             </div>
@@ -52,6 +52,25 @@
                             </select>
                         </div>
                         @error('currency')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="company_name" class="form-label text-secondary fw-semibold fs-7">Billed From: Company Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="fas fa-building"></i></span>
+                            <input type="text" id="company_name" name="company_name" class="form-control @error('company_name') is-invalid @enderror" value="{{ old('company_name', $user->company_name) }}" required placeholder="e.g. QueueBill Automation System">
+                        </div>
+                        @error('company_name')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="company_address" class="form-label text-secondary fw-semibold fs-7">Billed From: Company Address <span class="text-danger">*</span></label>
+                        <textarea id="company_address" name="company_address" class="form-control @error('company_address') is-invalid @enderror" rows="3" required placeholder="e.g.&#10;100 Revenue Way, Suite A&#10;Austin, TX 78701">{{ old('company_address', $user->company_address) }}</textarea>
+                        @error('company_address')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>

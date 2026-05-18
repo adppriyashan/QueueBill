@@ -76,6 +76,45 @@
         font-size: 0.75rem;
         backdrop-filter: blur(8px);
     }
+
+    @media print {
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+        /* Hide everything except the invoice column sheet */
+        .sidebar, .navbar, .alert, .btn, .card:not(.invoice-sheet), form, .col-lg-4 {
+            display: none !important;
+        }
+        .col-lg-8 {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 0 0 100% !important;
+            padding: 0 !important;
+        }
+        .invoice-sheet {
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .sheet-header-bar {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            padding: 20px 0 !important;
+        }
+        .sheet-header-bar h2, .sheet-header-bar h3 {
+            color: #0f172a !important;
+        }
+        .sheet-badge {
+            display: none !important;
+        }
+        .sheet-body {
+            padding: 20px 0 !important;
+        }
+    }
 </style>
 @endsection
 
@@ -92,7 +131,7 @@
                     @else
                         <span class="sheet-badge mb-2 d-inline-block">Standard Statement (v1)</span>
                     @endif
-                    <h2 class="fw-bold tracking-tight mb-1">Acme Global Services</h2>
+                    <h2 class="fw-bold tracking-tight mb-1">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</h2>
                     <p class="fs-8 mb-0 opacity-75">Layout branded via template: <strong>{{ $invoice->recurringService?->invoiceStructureTemplate?->title ?? 'Default Template' }}</strong></p>
                 </div>
                 <div class="text-md-end">
@@ -107,9 +146,8 @@
                 <div class="row g-4 mb-5 fs-7">
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed From</h6>
-                        <strong class="text-dark d-block">QueueBill Automation System</strong>
-                        <span class="text-muted d-block">100 Revenue Way, Suite A</span>
-                        <span class="text-muted d-block">Austin, TX 78701</span>
+                        <strong class="text-dark d-block">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</strong>
+                        <span class="text-muted d-block">{!! nl2br(e(auth()->user()->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}</span>
                         
                         <!-- Custom Fallback Email overridden via template properties -->
                         <span class="text-primary fw-medium d-block mt-2">
@@ -152,14 +190,59 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($invoice->invoiceItems as $item)
+                            @php
+                                $baseItem = $invoice->invoiceItems->first(function($item) {
+                                    return !$item->is_adhoc && str_contains(strtolower($item->description), 'base subscription');
+                                });
+                                if (!$baseItem) {
+                                    $baseItem = $invoice->invoiceItems->first(function($item) {
+                                        return !$item->is_adhoc && $item->amount > 0;
+                                    });
+                                }
+                                
+                                $scopeItems = $invoice->invoiceItems->filter(function($item) use ($baseItem) {
+                                    return !$item->is_adhoc && $item->amount == 0 && ($baseItem ? $item->id !== $baseItem->id : true);
+                                });
+                                
+                                $otherItems = $invoice->invoiceItems->filter(function($item) use ($baseItem, $scopeItems) {
+                                    $excludeIds = [];
+                                    if ($baseItem) $excludeIds[] = $baseItem->id;
+                                    foreach ($scopeItems as $si) $excludeIds[] = $si->id;
+                                    return !in_array($item->id, $excludeIds);
+                                });
+                            @endphp
+
+                            @if($baseItem)
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-dark">{{ $baseItem->description }}</div>
+                                        <span class="badge bg-primary-soft text-primary fs-9 px-2 py-0.5 mt-1 d-inline-block">Standard Base Cost</span>
+                                        @if($scopeItems->isNotEmpty())
+                                            <div class="mt-3 text-secondary">
+                                                <div class="fw-bold fs-8 text-uppercase tracking-wider mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">Included Contract Scope Elements:</div>
+                                                <ul class="ps-3 mb-0 fs-8" style="list-style-type: square;">
+                                                    @foreach($scopeItems as $scope)
+                                                        <li>{{ $scope->description }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="text-center text-secondary">1</td>
+                                    <td class="text-end fw-bold text-dark">
+                                        @currency($baseItem->amount)
+                                    </td>
+                                </tr>
+                            @endif
+
+                            @foreach($otherItems as $item)
                                 <tr>
                                     <td>
                                         <div class="fw-semibold text-dark">{{ $item->description }}</div>
                                         @if($item->is_adhoc)
                                             <span class="badge bg-warning-soft text-warning fs-9 px-2 py-0.5 mt-1 d-inline-block"><i class="fas fa-plus-circle me-1"></i>Ad-Hoc Line Injection</span>
                                         @else
-                                            <span class="badge bg-light text-secondary fs-9 px-2 py-0.5 mt-1 d-inline-block">Standard contract scope item</span>
+                                            <span class="badge bg-light text-secondary fs-9 px-2 py-0.5 mt-1 d-inline-block">Additional contract item</span>
                                         @endif
                                     </td>
                                     <td class="text-center text-secondary">1</td>
@@ -291,6 +374,16 @@
 
     <!-- Right Column: Scenario B Retroactive Adjustments Control Form -->
     <div class="col-12 col-lg-4">
+        <!-- Action Control Center -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 p-4 bg-white">
+            <h6 class="fw-bold mb-3"><i class="fas fa-tools text-primary me-2"></i>Statement Action Controls</h6>
+            <button onclick="window.print()" class="btn btn-primary w-100 py-2.5 fw-semibold fs-7 mb-2 rounded-3 shadow-sm">
+                <i class="fas fa-print me-2"></i>Print Statement Sheet
+            </button>
+            <a href="{{ route('companies.show', $invoice->company) }}" class="btn btn-light border w-100 py-2 fs-7 rounded-3 text-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Return to Profile
+            </a>
+        </div>
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
             <div class="card-header bg-white border-bottom p-4">
                 <div class="d-flex align-items-center">

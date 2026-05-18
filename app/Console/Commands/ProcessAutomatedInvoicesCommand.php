@@ -146,7 +146,7 @@ class ProcessAutomatedInvoicesCommand extends Command
                 'sender' => $senderEmail,
                 'recipient' => $service->company->email,
                 'subject' => "New Statement Generated: {$invoiceNumber} - QueueBill",
-                'body' => "Dear Customer,\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nRegards,\nAcme Global Services.",
+                'body' => "Dear Customer,\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nRegards,\n" . ($creator->company_name ?? 'QueueBill Automation System') . ".",
                 'status' => 'sent'
             ]);
 

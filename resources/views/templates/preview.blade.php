@@ -117,7 +117,7 @@
             <div class="template-header-bar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                 <div>
                     <span class="invoice-badge mb-3 d-inline-block">Simulated Statement</span>
-                    <h2 class="fw-bold tracking-tight mb-1">Acme Global Services</h2>
+                    <h2 class="fw-bold tracking-tight mb-1">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</h2>
                     <p class="fs-7 mb-0 opacity-75">Layout branded dynamically via template: <strong>{{ $template->title }}</strong></p>
                 </div>
                 <div class="text-md-end">
@@ -131,9 +131,8 @@
                 <div class="row g-4 mb-5 fs-7">
                     <div class="col-12 col-md-4">
                         <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Billed From</h6>
-                        <strong class="text-dark d-block">QueueBill Automation System</strong>
-                        <span class="text-muted d-block">100 Revenue Way, Suite A</span>
-                        <span class="text-muted d-block">Austin, TX 78701</span>
+                        <strong class="text-dark d-block">{{ auth()->user()->company_name ?? 'QueueBill Automation System' }}</strong>
+                        <span class="text-muted d-block">{!! nl2br(e(auth()->user()->company_address ?? "100 Revenue Way, Suite A\nAustin, TX 78701")) !!}</span>
                         <!-- Custom Fallback Email overridden via template properties -->
                         <span class="text-primary fw-medium d-block mt-2">
                             <i class="far fa-envelope me-1"></i>

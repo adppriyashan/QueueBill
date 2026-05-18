@@ -71,4 +71,5 @@ Handles out-of-band balance adjustments in two scenarios:
 ### Module 6: Settings & User Profile Management
 Allows administrative users to configure their session preferences and secure their account details.
 * **Currency Selection**: In settings, admins can select their preferred dynamic currency symbol (supporting `$`, `€`, `£`, `¥`, `Rs.`, `LKR`, `රු.`, `RM`, `AED`, `CHF`). Once saved, all invoices, pro-formas, creation forms, dashboards, and metrics update instantly in real-time.
+* **Company Information Settings**: Admins can customize their billing issuer details (**Billed From: Company Name** and **Billed From: Company Address**) inside settings. These parameters dynamically populate the sender address details block on all statements, templates, and pro-forma invoice previews.
 * **User Profile & Password Security**: Users can update their profile name and secure their account with password updates. For system security and audit compliance, the administrative email address is strictly read-only and cannot be changed inside settings.

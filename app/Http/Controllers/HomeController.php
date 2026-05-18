@@ -90,14 +90,18 @@ class HomeController extends Controller
     {
         $validated = $request->validate([
             'currency' => ['required', 'string', 'max:10'],
+            'company_name' => ['required', 'string', 'max:255'],
+            'company_address' => ['required', 'string', 'max:500'],
         ]);
 
         $user = auth()->user();
         $user->update([
-            'currency' => $validated['currency']
+            'currency' => $validated['currency'],
+            'company_name' => $validated['company_name'],
+            'company_address' => $validated['company_address'],
         ]);
 
-        return redirect()->route('settings')->with('success', 'System settings updated successfully!');
+        return redirect()->route('settings')->with('success', 'System and company settings updated successfully!');
     }
 
     public function updateProfile(Request $request)
