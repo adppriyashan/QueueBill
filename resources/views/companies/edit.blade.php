@@ -21,9 +21,29 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ route('companies.update', $company) }}">
+                    <form method="POST" action="{{ route('companies.update', $company) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+
+                        <!-- Logo Preview & Field -->
+                        @if($company->logo)
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fw-semibold fs-7 d-block">Current Logo</label>
+                                <div class="p-2 border rounded bg-light d-inline-block">
+                                    <img src="{{ asset($company->logo) }}" alt="Current Logo" style="height: 60px; max-width: 150px; object-fit: contain;">
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="mb-4">
+                            <label for="logo" class="form-label text-secondary fw-semibold fs-7">Company Logo</label>
+                            <input type="file" class="form-control @error('logo') is-invalid @enderror" id="logo"
+                                name="logo" accept="image/*">
+                            @error('logo')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text text-muted fs-8">Provide an image logo for client-branded statement headers.</div>
+                        </div>
 
                         <!-- Name Field -->
                         <div class="mb-4">

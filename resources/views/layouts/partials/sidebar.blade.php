@@ -3,7 +3,13 @@
     <div class="list-group list-group-flush mx-3">
       <!-- App Brand -->
       <div class="text-center pb-4 mb-4 border-bottom">
-        <h4 class="fw-bold mb-1 text-primary text-uppercase tracking-wider">QueueBill</h4>
+        @if(auth()->user()->company_logo)
+          <div class="mb-2">
+            <img src="{{ asset(auth()->user()->company_logo) }}" alt="Logo" style="max-height: 50px; max-width: 180px; object-fit: contain;">
+          </div>
+        @else
+          <h4 class="fw-bold mb-1 text-primary text-uppercase tracking-wider">QueueBill</h4>
+        @endif
       </div>
 
       <a href="{{ route('home') }}"

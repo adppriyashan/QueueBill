@@ -149,8 +149,15 @@
         <div class="invoice-sheet mb-4">
             <!-- Sheet Header -->
             <div class="sheet-header-bar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
-                    <h2 class="fw-bold tracking-tight mb-1">{{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}</h2>
+                <div class="d-flex align-items-center gap-3">
+                    @if($invoice->creator?->company_logo)
+                        <div class="p-2 border rounded bg-white" style="box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                            <img src="{{ asset($invoice->creator->company_logo) }}" alt="Logo" style="height: 50px; max-width: 150px; object-fit: contain;">
+                        </div>
+                    @endif
+                    <div>
+                        <h2 class="fw-bold tracking-tight mb-1">{{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}</h2>
+                    </div>
                 </div>
                 <div class="text-md-end">
                     <h3 class="fw-bold mb-0">INVOICE @if($invoice->version > 1) (Revised) @endif</h3>

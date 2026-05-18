@@ -33,8 +33,29 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form action="{{ route('settings.update') }}" method="POST">
+                    <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+
+                        <!-- Biller Logo Field -->
+                        @if($user->company_logo)
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fw-semibold fs-7 d-block">Current Company Logo</label>
+                                <div class="p-2 border rounded bg-light d-inline-block">
+                                    <img src="{{ asset($user->company_logo) }}" alt="Current Logo" style="height: 60px; max-width: 150px; object-fit: contain;">
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="mb-4">
+                            <label for="company_logo" class="form-label text-secondary fw-semibold fs-7">Company Logo</label>
+                            <input type="file" id="company_logo" name="company_logo"
+                                class="form-control @error('company_logo') is-invalid @enderror"
+                                accept="image/*">
+                            @error('company_logo')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text text-muted fs-8">Provide an image logo representing your company (the biller) on invoice statement templates.</div>
+                        </div>
 
                         <div class="mb-4">
                             <label for="currency" class="form-label text-secondary fw-semibold fs-7">Select Currency

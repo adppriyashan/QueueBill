@@ -23,9 +23,13 @@
       @auth
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <div class="avatar-ring d-inline-flex justify-content-center align-items-center bg-primary-soft text-primary rounded-circle me-2" style="width: 32px; height: 32px; font-size: 0.85rem; font-weight: 600;">
-            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-          </div>
+          @if(auth()->user()->company_logo)
+            <img src="{{ asset(auth()->user()->company_logo) }}" alt="Logo" class="rounded-circle me-2 border border-2 border-primary-soft" style="width: 32px; height: 32px; object-fit: contain; padding: 2px;">
+          @else
+            <div class="avatar-ring d-inline-flex justify-content-center align-items-center bg-primary-soft text-primary rounded-circle me-2" style="width: 32px; height: 32px; font-size: 0.85rem; font-weight: 600;">
+              {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+            </div>
+          @endif
           <span class="text-dark fw-medium d-none d-sm-inline">{{ auth()->user()->name }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="navbarDropdownMenuLink">

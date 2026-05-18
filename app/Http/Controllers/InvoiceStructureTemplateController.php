@@ -83,8 +83,9 @@ class InvoiceStructureTemplateController extends Controller
     public function renderTemplate($slug)
     {
         $template = InvoiceStructureTemplate::where('slug', $slug)->firstOrFail();
+        $sampleCompany = \App\Models\Company::whereNotNull('logo')->first() ?? \App\Models\Company::first();
         
         // Render a gorgeous sample invoice layout branded to this template!
-        return view('templates.preview', compact('template'));
+        return view('templates.preview', compact('template', 'sampleCompany'));
     }
 }

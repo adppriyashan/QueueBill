@@ -18,16 +18,27 @@ class InvoiceStatementMail extends Mailable
     public $subjectText;
     public $pdfData;
     public $pdfFilename;
+    public $companyLogo;
+
+    public $companyName;
+    public $companyEmail;
+    public $companyPhone;
+    public $companyAddress;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subjectText, $bodyText, $pdfData, $pdfFilename)
+    public function __construct($subjectText, $bodyText, $pdfData, $pdfFilename, $companyLogo = null, $companyName = null, $companyEmail = null, $companyPhone = null, $companyAddress = null)
     {
         $this->subjectText = $subjectText;
         $this->bodyText = $bodyText;
         $this->pdfData = $pdfData;
         $this->pdfFilename = $pdfFilename;
+        $this->companyLogo = $companyLogo;
+        $this->companyName = $companyName;
+        $this->companyEmail = $companyEmail;
+        $this->companyPhone = $companyPhone;
+        $this->companyAddress = $companyAddress;
     }
 
     /**

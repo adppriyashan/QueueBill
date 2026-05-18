@@ -130,11 +130,13 @@
             <!-- Partition A: Dynamic Custom Branded Header -->
             <div
                 class="template-header-bar d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
-                    <span class="invoice-badge mb-3 d-inline-block">Simulated Statement</span>
-                    <h2 class="fw-bold tracking-tight mb-1">
-                        {{ auth()->user()->company_name ?? env('APP_NAME', 'QueueBill') }}
-                    </h2>
+                <div class="d-flex align-items-center gap-3">
+                    <div>
+                        <span class="invoice-badge mb-3 d-inline-block">Simulated Statement</span>
+                        <h2 class="fw-bold tracking-tight mb-1">
+                            {{ auth()->user()->company_name ?? env('APP_NAME', 'QueueBill') }}
+                        </h2>
+                    </div>
                 </div>
                 <div class="text-md-end">
                     <h3 class="fw-bold mb-1">INVOICE</h3>

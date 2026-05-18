@@ -113,8 +113,25 @@ class InvoiceController extends Controller
 
         $emailStatus = 'failed';
         $subjectText = "REVISED STATEMENT (v{$newVersion}) for Invoice {$invoice->invoice_number}";
+
+        $companyName = $creator->company_name;
+        $companyEmail = $creator->email;
+        $companyPhone = $creator->phone;
+        $companyAddress = $creator->address;
+        $companyLogo = $creator->company_logo;
+
         try {
-            Mail::to($invoice->company->email)->send(new InvoiceStatementMail($subjectText, $bodyText, $pdfData, $pdfFilename));
+            Mail::to($invoice->company->email)->send(new InvoiceStatementMail(
+                $subjectText,
+                $bodyText,
+                $pdfData,
+                $pdfFilename,
+                $companyLogo,
+                $companyName,
+                $companyEmail,
+                $companyPhone,
+                $companyAddress
+            ));
             $emailStatus = 'sent';
         } catch (\Exception $e) {
             // failed, status logged below
@@ -201,8 +218,26 @@ class InvoiceController extends Controller
         $pdfFilename = "{$invoice->invoice_number}_v{$invoice->version}.pdf";
 
         $emailStatus = 'failed';
+
+        // Company details for email template
+        $companyName = $creator->company_name;
+        $companyEmail = $creator->email;
+        $companyPhone = $creator->phone;
+        $companyAddress = $creator->address;
+        $companyLogo = $creator->company_logo;
+
         try {
-            Mail::to($invoice->company->email)->send(new InvoiceStatementMail($subjectText, $bodyText, $pdfData, $pdfFilename));
+            Mail::to($invoice->company->email)->send(new InvoiceStatementMail(
+                $subjectText,
+                $bodyText,
+                $pdfData,
+                $pdfFilename,
+                $companyLogo,
+                $companyName,
+                $companyEmail,
+                $companyPhone,
+                $companyAddress
+            ));
             $emailStatus = 'sent';
         } catch (\Exception $e) {
             // failed, status logged below

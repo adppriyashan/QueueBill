@@ -92,14 +92,27 @@ class HomeController extends Controller
             'currency' => ['required', 'string', 'max:10'],
             'company_name' => ['required', 'string', 'max:255'],
             'company_address' => ['required', 'string', 'max:500'],
+            'company_logo' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $user = auth()->user();
-        $user->update([
+        $data = [
             'currency' => $validated['currency'],
             'company_name' => $validated['company_name'],
             'company_address' => $validated['company_address'],
-        ]);
+        ];
+
+        if ($request->hasFile('company_logo')) {
+            // Delete old file if exists
+            if ($user->company_logo && file_exists(public_path($user->company_logo))) {
+                @unlink(public_path($user->company_logo));
+            }
+            // Store new logo
+            $path = $request->file('company_logo')->store('logos', 'public');
+            $data['company_logo'] = 'storage/' . $path;
+        }
+
+        $user->update($data);
 
         return redirect()->route('settings')->with('success', 'System and company settings updated successfully!');
     }

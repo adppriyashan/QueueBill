@@ -31,6 +31,7 @@ class CompanyController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:companies,email'],
             'phone' => ['nullable', 'string', 'regex:/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/'],
             'address' => ['nullable', 'string'],
@@ -39,7 +40,13 @@ class CompanyController extends Controller
             'phone.regex' => 'Please enter a valid standard phone format (e.g. +1-555-555-5555, (555) 555-5555, etc.)'
         ]);
 
-        Company::create($validated);
+        $data = $validated;
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('logos', 'public');
+            $data['logo'] = 'storage/' . $path;
+        }
+
+        Company::create($data);
 
         return redirect()->route('companies.index')
             ->with('success', 'Company created successfully!');
@@ -66,6 +73,7 @@ class CompanyController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:companies,email,' . $company->id],
             'phone' => ['nullable', 'string', 'regex:/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/'],
             'address' => ['nullable', 'string'],
@@ -74,7 +82,17 @@ class CompanyController extends Controller
             'phone.regex' => 'Please enter a valid standard phone format.'
         ]);
 
-        $company->update($validated);
+        $data = $validated;
+        if ($request->hasFile('logo')) {
+            // Delete old logo if it exists
+            if ($company->logo && file_exists(public_path($company->logo))) {
+                @unlink(public_path($company->logo));
+            }
+            $path = $request->file('logo')->store('logos', 'public');
+            $data['logo'] = 'storage/' . $path;
+        }
+
+        $company->update($data);
 
         return redirect()->route('companies.index')
             ->with('success', 'Company updated successfully!');
