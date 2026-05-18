@@ -81,19 +81,39 @@
     }
 
     @media print {
-        body {
+        html, body {
             background: #ffffff !important;
             color: #000000 !important;
+            height: auto !important;
+            min-height: auto !important;
+            display: block !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+        }
+        main {
+            padding: 0 !important;
+            min-height: auto !important;
+            display: block !important;
+            overflow: visible !important;
+        }
+        .container-fluid {
+            padding: 0 !important;
         }
         /* Hide everything except the invoice sheet */
-        .sidebar, .navbar, .alert, .btn, button, a {
+        .sidebar, .navbar, .alert, .btn, button, a, footer {
             display: none !important;
         }
-        .col-12 {
+        .col-12, .col-xl-10 {
             width: 100% !important;
             max-width: 100% !important;
             flex: 0 0 100% !important;
             padding: 0 !important;
+            margin: 0 !important;
+        }
+        tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
         .invoice-sheet {
             box-shadow: none !important;

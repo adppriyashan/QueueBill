@@ -78,19 +78,39 @@
     }
 
     @media print {
-        body {
+        html, body {
             background: #ffffff !important;
             color: #000000 !important;
+            height: auto !important;
+            min-height: auto !important;
+            display: block !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+        }
+        main {
+            padding: 0 !important;
+            min-height: auto !important;
+            display: block !important;
+            overflow: visible !important;
+        }
+        .container-fluid {
+            padding: 0 !important;
         }
         /* Hide everything except the invoice column sheet */
-        .sidebar, .navbar, .alert, .btn, .card:not(.invoice-sheet), form, .col-lg-4 {
+        .sidebar, .navbar, .alert, .btn, .card:not(.invoice-sheet), form, .col-lg-4, footer {
             display: none !important;
         }
-        .col-lg-8 {
+        .col-lg-8, .col-12 {
             width: 100% !important;
             max-width: 100% !important;
             flex: 0 0 100% !important;
             padding: 0 !important;
+            margin: 0 !important;
+        }
+        tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
         .invoice-sheet {
             box-shadow: none !important;
