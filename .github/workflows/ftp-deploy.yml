@@ -16,7 +16,7 @@ jobs:
     - name: ⚙️ Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2' # Update this if you use a different PHP version
+        php-version: '8.3' # Update this if you use a different PHP version
 
     - name: 📦 Install PHP Dependencies (Composer)
       run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
