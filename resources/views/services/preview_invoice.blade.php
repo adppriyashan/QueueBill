@@ -304,7 +304,17 @@
                 </div>
 
                 <!-- Totals row -->
-                <div class="row justify-content-end text-md-end fs-7">
+                <div class="row justify-content-between text-md-end fs-7">
+                    <div class="col-12 col-md-6 text-md-start">
+                        @if($service->note)
+                            <div class="card bg-light border-0 mb-4 mt-2">
+                                <div class="card-body py-3 px-4">
+                                    <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Notes</h6>
+                                    <p class="mb-0 text-dark" style="white-space: pre-line;">{{ $service->note }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                     <div class="col-12 col-md-5">
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span class="text-secondary fw-semibold">Subtotal:</span>

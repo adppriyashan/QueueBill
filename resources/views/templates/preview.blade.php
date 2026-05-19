@@ -220,7 +220,16 @@
                 </div>
 
                 <!-- Partition D: Sum totals -->
-                <div class="row justify-content-end text-md-end">
+                <div class="row justify-content-between text-md-end">
+                    <div class="col-12 col-md-6 text-md-start">
+                        <div class="card bg-light border-0 mb-4 mt-2">
+                            <div class="card-body py-3 px-4">
+                                <h6 class="text-secondary fw-bold text-uppercase fs-8 mb-2">Notes</h6>
+                                <p class="mb-0 text-dark" style="white-space: pre-line;">Thank you for your business.
+                                Please note that this is a simulated note.</p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-12 col-md-5">
                         <div class="d-flex justify-content-between py-2 border-bottom fs-7">
                             <span class="text-secondary fw-semibold">Subtotal:</span>

@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class InvoiceController extends Controller
 {
@@ -213,9 +214,10 @@ class InvoiceController extends Controller
         $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems', 'creator']);
 
         // Generate PDF using the clean, dedicated PDF view
-        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
-        $pdfData = $pdf->output();
         $pdfFilename = "{$invoice->invoice_number}_v{$invoice->version}.pdf";
+        $pdfData = Storage::disk('public')->put($pdfFilename, Pdf::loadView('invoices.pdf', compact('invoice'))->output());
+
+        return 1;
 
         $emailStatus = 'failed';
 

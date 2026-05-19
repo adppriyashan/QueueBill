@@ -128,6 +128,16 @@
                         <div class="form-text text-muted fs-8">When configured, all generated invoices during automation runs are simulated as uploaded to this target directory in Google Drive.</div>
                     </div>
 
+                    <!-- Note -->
+                    <div class="mb-4">
+                        <label for="note" class="form-label text-secondary fw-semibold fs-7">Invoice Note (Optional)</label>
+                        <textarea class="form-control @error('note') is-invalid @enderror" id="note" name="note" rows="3" placeholder="e.g. Please pay to the following bank account: 8742804982042804">{{ old('note', $service->note) }}</textarea>
+                        @error('note')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text text-muted fs-8">This note will be printed in the PDF invoice.</div>
+                    </div>
+
                     <!-- Status -->
                     <div class="mb-4">
                         <label for="status" class="form-label text-secondary fw-semibold fs-7">Billing Cycle Status <span class="text-danger">*</span></label>

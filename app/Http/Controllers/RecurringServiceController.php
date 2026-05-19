@@ -36,6 +36,7 @@ class RecurringServiceController extends Controller
             'base_cost' => ['required', 'numeric', 'min:0'],
             'invoice_includes' => ['required', 'string'],
             'google_drive_path' => ['nullable', 'string', 'max:255'],
+            'note' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ]);
 
@@ -82,6 +83,7 @@ class RecurringServiceController extends Controller
             'base_cost' => ['required', 'numeric', 'min:0'],
             'invoice_includes' => ['required', 'string'],
             'google_drive_path' => ['nullable', 'string', 'max:255'],
+            'note' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
         ]);
 

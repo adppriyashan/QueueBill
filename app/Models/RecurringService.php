@@ -21,6 +21,7 @@ class RecurringService extends Model
         'next_billing_date',
         'google_drive_path',
         'status',
+        'note',
         'created_by',
         'updated_by',
     ];

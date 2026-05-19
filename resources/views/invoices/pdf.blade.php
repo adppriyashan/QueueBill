@@ -392,7 +392,7 @@
 
         .notes-content {
             color: #6b7280;
-            font-size: 12px;
+            font-size: 10px;
             line-height: 1.9;
         }
 
@@ -743,19 +743,19 @@
 
                         <div class="totals-section clearfix">
 
-                            <div class="notes-card">
+                            @if($invoice->recurringService && $invoice->recurringService->note)
+                                <div class="notes-card">
 
-                                <div class="notes-label">
-                                    Notes
+                                    <div class="notes-label">
+                                        Notes
+                                    </div>
+
+                                    <div class="notes-content">
+                                        {!! nl2br(e($invoice->recurringService->note)) !!}
+                                    </div>
+
                                 </div>
-
-                                <div class="notes-content">
-                                    8742804982042804
-                                    <br>
-                                    HNB Bank - Kohuwala
-                                </div>
-
-                            </div>
+                            @endif
 
                             <div class="totals-card">
 
@@ -824,7 +824,6 @@
 
         <div>
             Thank you for your business.
-            Please contact us for any invoice clarification.
         </div>
 
     </div>
