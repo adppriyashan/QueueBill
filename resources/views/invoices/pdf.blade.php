@@ -339,7 +339,7 @@
         }
 
         .totals-table td {
-            padding: 15px 24px;
+            padding: 5px 24px;
             font-size: 14px;
         }
 
@@ -378,7 +378,8 @@
         .notes-card {
             width: 200px;
             float: left;
-            padding: 24px 28px;
+            padding: 10px 5px;
+            padding-top: 0px;
         }
 
         .notes-label {
@@ -393,7 +394,7 @@
         .notes-content {
             color: #6b7280;
             font-size: 10px;
-            line-height: 1.9;
+            line-height: 1.2;
         }
 
         /* =========================
