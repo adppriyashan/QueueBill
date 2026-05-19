@@ -5,7 +5,7 @@
 
 @section('content')
 <!-- Welcome Banner -->
-<div class="card mb-4 border-0 shadow-sm rounded-4 text-white overflow-hidden" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+<div class="card mb-4 border-0 shadow-sm rounded-4 text-white overflow-hidden animate-fade-in stagger-1" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
     <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
         <div>
             <h2 class="fw-bold tracking-tight mb-2">Welcome to QueueBill Console</h2>
@@ -18,7 +18,7 @@
 </div>
 
 <!-- Metrics Cards -->
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-4 animate-fade-in stagger-2">
     <div class="col-12 col-md-4">
         <div class="card card-hover h-100 p-3 bg-white">
             <div class="d-flex align-items-center">
@@ -61,7 +61,7 @@
 </div>
 
 <!-- Sandbox Command simulation panel -->
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 animate-fade-in stagger-3">
     <div class="card-header bg-white border-bottom p-4">
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
@@ -107,7 +107,7 @@
 
 <div class="row g-4">
     <!-- Upcoming schedules -->
-    <div class="col-12 col-xl-5">
+    <div class="col-12 col-xl-5 animate-fade-in stagger-4">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
             <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold mb-0">Upcoming Billings Queue</h5>
@@ -152,7 +152,7 @@
     </div>
 
     <!-- Recent invoices -->
-    <div class="col-12 col-xl-7">
+    <div class="col-12 col-xl-7 animate-fade-in stagger-5">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
             <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold mb-0">Recent Generated Statement Ledger</h5>

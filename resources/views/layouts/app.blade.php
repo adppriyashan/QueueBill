@@ -73,6 +73,16 @@
             color: #1e293b;
         }
 
+        .sidebar .list-group-item.active {
+            color: #4f46e5 !important;
+            background-color: var(--primary-soft) !important;
+            border-color: transparent !important;
+        }
+        
+        .sidebar .list-group-item.active * {
+            color: #4f46e5 !important;
+        }
+
         /* Top Navbar */
         #main-navbar {
             height: 62px;
@@ -89,26 +99,55 @@
         main {
             padding-top: 86px;
             min-height: calc(100vh - 62px);
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         /* Card and Glassmorphism */
         .card {
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            background: #ffffff;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            z-index: 1;
         }
         
         .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.85);
         }
         
         .gradient-card-primary {
             background: var(--primary-gradient);
             color: #ffffff;
             border: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gradient-card-primary::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            z-index: -1;
         }
 
         .gradient-card-secondary {
@@ -116,6 +155,15 @@
             color: #ffffff;
             border: none;
         }
+
+        /* Animation Utilities */
+        .animate-fade-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
 
         /* Alertsofts */
         .bg-primary-soft { background-color: var(--primary-soft); }
