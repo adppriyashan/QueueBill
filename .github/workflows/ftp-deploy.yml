@@ -1,41 +1,42 @@
 name: Deploy via FTP
 
 on:
-  push:
-    branches:
-      - main # Update to your production branch if it is not 'main'
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main # Update to your production branch if it is not 'main'
 
 jobs:
   web-deploy:
     name: 🎉 Deploy to Server
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
-      
-    - name: ⚙️ Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3' # Update this if you use a different PHP version
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
 
-    - name: 📦 Install PHP Dependencies (Composer)
-      run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+      - name: ⚙️ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3" # Update this if you use a different PHP version
 
-    - name: 📂 Sync files via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./
-        # Exclude files/directories that shouldn't be uploaded to the server
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/tests/**
-          .env.example
-          phpunit.xml
-          README.md
-          .github/**
-          tests/**
+      - name: 📦 Install PHP Dependencies (Composer)
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: 📂 Sync files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ./
+          # Exclude files/directories that shouldn't be uploaded to the server
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            .env.example
+            phpunit.xml
+            README.md
+            .github/**
+            tests/**
