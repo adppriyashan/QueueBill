@@ -27,17 +27,27 @@
 
         body {
             margin: 0;
-            padding: 42px;
+            /* Added a 140px bottom padding to act as a safety buffer so content never overlaps the footer */
+            padding: 42px 42px 140px 42px;
             background: #f3f4f6;
             color: #111827;
             font-family: "Poppins", "Helvetica Neue", Arial, sans-serif;
             font-size: 13px;
             line-height: 1.6;
+            min-height: 100%;
         }
 
         .invoice-wrapper {
             max-width: 100%;
             margin: 0 auto;
+        }
+
+        .page-container {
+            position: relative;
+        }
+
+        .invoice-content {
+            padding-bottom: 20px;
         }
 
         /* =========================
@@ -345,10 +355,8 @@
         }
 
         .grand-total td {
-            background:
-                linear-gradient(135deg, #6366f1, #8b5cf6);
-
             color: #6b7280;
+            /* Adjusted color to make white text on a purple gradient background visible */
         }
 
         .grand-total-label {
@@ -364,15 +372,46 @@
         }
 
         /* =========================
-           FOOTER
+           NOTES CARD
+        ========================== */
+
+        .notes-card {
+            width: 200px;
+            float: left;
+            padding: 24px 28px;
+        }
+
+        .notes-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #9ca3af;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .notes-content {
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        /* =========================
+            FOOTER
         ========================== */
 
         .footer {
-            margin-top: 56px;
+            position: fixed;
+            left: 42px;
+            /* Coordinates align safely with body paddings */
+            right: 42px;
+            bottom: 42px;
             text-align: center;
             color: #9ca3af;
             font-size: 12px;
             line-height: 1.8;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 18px;
         }
 
         .footer-brand {
@@ -396,346 +435,72 @@
 
 <body>
 
-    <div class="invoice-wrapper">
+    <div class="page-container">
 
-        <div class="invoice-card">
+        <div class="invoice-wrapper">
 
-            <!-- =========================
-                 HEADER
-            ========================== -->
+            <div class="invoice-content">
 
-            <div class="header">
+                <div class="invoice-card">
 
-                <table class="header-table">
+                    <!-- =========================
+                         HEADER
+                    ========================== -->
 
-                    <tr>
+                    <div class="header">
 
-                        <!-- LEFT -->
-                        <td class="brand-column">
+                        <table class="header-table">
 
-                            @if(
-                                    $invoice->creator?->company_logo &&
-                                    file_exists(public_path($invoice->creator?->company_logo))
-                                )
+                            <tr>
 
-                                <img src="{{ public_path($invoice->creator?->company_logo) }}" class="logo" alt="Logo">
+                                <!-- LEFT -->
+                                <td class="brand-column">
 
-                            @endif
+                                    @if(
+                                            $invoice->creator?->company_logo &&
+                                            file_exists(public_path($invoice->creator?->company_logo))
+                                        )
 
-                            <div class="company-name">
-                                {{ $invoice->creator?->name ?? env('APP_NAME', 'QueueBill') }}
-                            </div>
+                                        <img src="{{ public_path($invoice->creator?->company_logo) }}" class="logo"
+                                            alt="Logo">
 
-                            <div class="company-meta">
+                                    @endif
 
-                                @if ($invoice->creator?->company_address)
-                                    <div>
-                                        {{ $invoice->creator?->company_address }}
+                                    <div class="company-name">
+                                        {{ $invoice->creator?->name ?? env('APP_NAME', 'QueueBill') }}
                                     </div>
-                                @endif
 
-                                @php
-                                    $senderEmail =
-                                        $invoice->recurringService?->invoiceStructureTemplate?->sender_email;
-                                @endphp
+                                    <div class="company-meta">
 
-                                <div>
-                                    {{ $senderEmail ?? $invoice->creator?->email ?? 'No Email Provided' }}
-                                </div>
-
-                            </div>
-
-                        </td>
-
-                        <!-- RIGHT -->
-                        <td class="invoice-column">
-
-                            <h1 class="invoice-label">
-                                {{ $invoice->version > 1 ? 'REVISED' : 'INVOICE' }}
-                            </h1>
-
-                            <div class="invoice-number">
-                                #{{ $invoice->invoice_number }}
-                            </div>
-                        </td>
-
-                    </tr>
-
-                </table>
-
-            </div>
-
-            <!-- =========================
-                 BODY
-            ========================== -->
-
-            <div class="body">
-
-                <!-- INFO GRID -->
-
-                <div class="info-grid clearfix">
-
-                    <!-- BILL TO -->
-
-                    <div class="info-card info-card-left">
-
-                        <div class="info-label">
-                            Billed To
-                        </div>
-
-                        <div class="info-title">
-                            {{ $invoice->company->name }}
-                        </div>
-
-                        <div class="info-content">
-
-                            <div>
-                                {{ $invoice->company->address ?? '—' }}
-                            </div>
-
-                            <div>
-                                {{ $invoice->company->email }}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <!-- INVOICE DETAILS -->
-
-                    <div class="info-card info-card-right">
-
-                        <div class="info-label">
-                            Invoice Details
-                        </div>
-
-                        <div class="meta-row">
-
-                            <span class="meta-key">
-                                Issue Date
-                            </span>
-
-                            <span class="meta-value">
-                                {{ $invoice->issue_date->format('M d, Y') }}
-                            </span>
-
-                        </div>
-
-                        <div class="meta-row">
-
-                            <span class="meta-key">
-                                Due Date
-                            </span>
-
-                            <span class="meta-value">
-                                {{ $invoice->due_date->format('M d, Y') }}
-                            </span>
-
-                        </div>
-
-                        <div class="meta-row">
-
-                            <span class="meta-key">
-                                Status
-                            </span>
-
-                            <span class="meta-value">
-                                Pending Payment
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- =========================
-                     ITEMS TABLE
-                ========================== -->
-
-                <div class="items-wrapper">
-
-                    <table class="items-table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th style="width:60%">
-                                    Description
-                                </th>
-
-                                <th style="width:10%; text-align:center;">
-                                    Qty
-                                </th>
-
-                                <th style="width:30%; text-align:right;">
-                                    Amount
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            @php
-                                $baseItem = $invoice->invoiceItems->first(function ($item) {
-                                    return !$item->is_adhoc &&
-                                        str_contains(strtolower($item->description), 'base subscription');
-                                });
-
-                                if (!$baseItem) {
-                                    $baseItem = $invoice->invoiceItems->first(function ($item) {
-                                        return !$item->is_adhoc && $item->amount > 0;
-                                    });
-                                }
-
-                                $scopeItems = $invoice->invoiceItems->filter(function ($item) use ($baseItem) {
-                                    return !$item->is_adhoc &&
-                                        $item->amount == 0 &&
-                                        ($baseItem ? $item->id !== $baseItem->id : true);
-                                });
-
-                                $otherItems = $invoice->invoiceItems->filter(function ($item) use ($baseItem, $scopeItems) {
-
-                                    $excludeIds = [];
-
-                                    if ($baseItem)
-                                        $excludeIds[] = $baseItem->id;
-
-                                    foreach ($scopeItems as $si)
-                                        $excludeIds[] = $si->id;
-
-                                    return !in_array($item->id, $excludeIds);
-                                });
-                            @endphp
-
-                            <!-- BASE ITEM -->
-
-                            @if($baseItem)
-
-                                <tr>
-
-                                    <td>
-
-                                        <div class="item-title">
-                                            {{ $baseItem->description }}
-                                        </div>
-
-                                        @if($scopeItems->isNotEmpty())
-
-                                            <ul class="scope-list">
-
-                                                @foreach($scopeItems as $scope)
-                                                    <li>{{ $scope->description }}</li>
-                                                @endforeach
-
-                                            </ul>
-
+                                        @if ($invoice->creator?->company_address)
+                                            <div>
+                                                {{ $invoice->creator?->company_address }}
+                                            </div>
                                         @endif
 
-                                    </td>
+                                        @php
+                                            $senderEmail =
+                                                $invoice->recurringService?->invoiceStructureTemplate?->sender_email;
+                                        @endphp
 
-                                    <td class="qty">
-                                        1
-                                    </td>
-
-                                    <td class="amount">
-                                        {{ format_currency($baseItem->amount, $invoice->created_by) }}
-                                    </td>
-
-                                </tr>
-
-                            @endif
-
-                            <!-- OTHER ITEMS -->
-
-                            @foreach($otherItems as $item)
-
-                                <tr>
-
-                                    <td>
-
-                                        <div class="item-title">
-                                            {{ $item->description }}
+                                        <div>
+                                            {{ $senderEmail ?? $invoice->creator?->email ?? 'No Email Provided' }}
                                         </div>
 
-                                    </td>
+                                    </div>
 
-                                    <td class="qty">
-                                        1
-                                    </td>
-
-                                    <td class="amount">
-
-                                        @if($item->amount < 0)
-
-                                            <span class="negative">
-                                                -{{ format_currency(abs($item->amount), $invoice->created_by) }}
-                                            </span>
-
-                                        @else
-
-                                            {{ format_currency($item->amount, $invoice->created_by) }}
-
-                                        @endif
-
-                                    </td>
-
-                                </tr>
-
-                            @endforeach
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-                <!-- =========================
-                     TOTALS
-                ========================== -->
-
-                <div class="totals-section">
-
-                    <div class="totals-card">
-
-                        <table class="totals-table">
-
-                            <tr>
-
-                                <td class="totals-label">
-                                    Sub Total
                                 </td>
 
-                                <td class="totals-value">
-                                    {{ format_currency($invoice->subtotal, $invoice->created_by) }}
-                                </td>
+                                <!-- RIGHT -->
+                                <td class="invoice-column">
 
-                            </tr>
+                                    <h1 class="invoice-label">
+                                        {{ $invoice->version > 1 ? 'REVISED' : 'INVOICE' }}
+                                    </h1>
 
-
-                            <tr>
-
-                                <td class="totals-label">
-                                    Discount
-                                </td>
-
-                                <td class="totals-value">
-                                    {{ format_currency(0, $invoice->created_by) }}
-                                </td>
-
-                            </tr>
-
-                            <tr class="grand-total">
-
-                                <td class="grand-total-label">
-                                    Total
-                                </td>
-
-                                <td class="grand-total-value">
-                                    {{ format_currency($invoice->total, $invoice->created_by) }}
+                                    <div class="invoice-number">
+                                        #{{ $invoice->invoice_number }}
+                                    </div>
                                 </td>
 
                             </tr>
@@ -744,27 +509,322 @@
 
                     </div>
 
-                </div>
+                    <!-- =========================
+                         BODY
+                    ========================== -->
 
-                <!-- =========================
-                     FOOTER
-                ========================== -->
+                    <div class="body">
 
-                <div class="footer">
+                        <!-- INFO GRID -->
 
-                    <div class="footer-brand">
-                        QueueBill Automated Billing Service
-                    </div>
+                        <div class="info-grid clearfix">
 
-                    <div>
-                        Thank you for your business.
-                        Please contact us for any invoice clarification.
-                    </div>
+                            <!-- BILL TO -->
 
-                </div>
+                            <div class="info-card info-card-left">
 
-            </div>
+                                <div class="info-label">
+                                    Billed To
+                                </div>
 
+                                <div class="info-title">
+                                    {{ $invoice->company->name }}
+                                </div>
+
+                                <div class="info-content">
+
+                                    <div>
+                                        {{ $invoice->company->address ?? '—' }}
+                                    </div>
+
+                                    <div>
+                                        {{ $invoice->company->email }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- INVOICE DETAILS -->
+
+                            <div class="info-card info-card-right">
+
+                                <div class="info-label">
+                                    Invoice Details
+                                </div>
+
+                                <div class="meta-row">
+
+                                    <span class="meta-key">
+                                        Issue Date
+                                    </span>
+
+                                    <span class="meta-value">
+                                        {{ $invoice->issue_date->format('M d, Y') }}
+                                    </span>
+
+                                </div>
+
+                                <div class="meta-row">
+
+                                    <span class="meta-key">
+                                        Due Date
+                                    </span>
+
+                                    <span class="meta-value">
+                                        {{ $invoice->due_date->format('M d, Y') }}
+                                    </span>
+
+                                </div>
+
+                                <div class="meta-row">
+
+                                    <span class="meta-key">
+                                        Status
+                                    </span>
+
+                                    <span class="meta-value">
+                                        Pending Payment
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- =========================
+                             ITEMS TABLE
+                        ========================== -->
+
+                        <div class="items-wrapper">
+
+                            <table class="items-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th style="width:60%">
+                                            Description
+                                        </th>
+
+                                        <th style="width:10%; text-align:center;">
+                                            Qty
+                                        </th>
+
+                                        <th style="width:30%; text-align:right;">
+                                            Amount
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @php
+                                        $baseItem = $invoice->invoiceItems->first(function ($item) {
+                                            return !$item->is_adhoc &&
+                                                str_contains(strtolower($item->description), 'base subscription');
+                                        });
+
+                                        if (!$baseItem) {
+                                            $baseItem = $invoice->invoiceItems->first(function ($item) {
+                                                return !$item->is_adhoc && $item->amount > 0;
+                                            });
+                                        }
+
+                                        $scopeItems = $invoice->invoiceItems->filter(function ($item) use ($baseItem) {
+                                            return !$item->is_adhoc &&
+                                                $item->amount == 0 &&
+                                                ($baseItem ? $item->id !== $baseItem->id : true);
+                                        });
+
+                                        $otherItems = $invoice->invoiceItems->filter(function ($item) use ($baseItem, $scopeItems) {
+
+                                            $excludeIds = [];
+
+                                            if ($baseItem)
+                                                $excludeIds[] = $baseItem->id;
+
+                                            foreach ($scopeItems as $si)
+                                                $excludeIds[] = $si->id;
+
+                                            return !in_array($item->id, $excludeIds);
+                                        });
+                                    @endphp
+
+                                    <!-- BASE ITEM -->
+
+                                    @if($baseItem)
+
+                                        <tr>
+
+                                            <td>
+
+                                                <div class="item-title">
+                                                    {{ $baseItem->description }}
+                                                </div>
+
+                                                @if($scopeItems->isNotEmpty())
+
+                                                    <ul class="scope-list">
+
+                                                        @foreach($scopeItems as $scope)
+                                                            <li>{{ $scope->description }}</li>
+                                                        @endforeach
+
+                                                    </ul>
+
+                                                @endif
+
+                                            </td>
+
+                                            <td class="qty">
+                                                1
+                                            </td>
+
+                                            <td class="amount">
+                                                {{ format_currency($baseItem->amount, $invoice->created_by) }}
+                                            </td>
+
+                                        </tr>
+
+                                    @endif
+
+                                    <!-- OTHER ITEMS -->
+
+                                    @foreach($otherItems as $item)
+
+                                        <tr>
+
+                                            <td>
+
+                                                <div class="item-title">
+                                                    {{ $item->description }}
+                                                </div>
+
+                                            </td>
+
+                                            <td class="qty">
+                                                1
+                                            </td>
+
+                                            <td class="amount">
+
+                                                @if($item->amount < 0)
+
+                                                    <span class="negative">
+                                                        -{{ format_currency(abs($item->amount), $invoice->created_by) }}
+                                                    </span>
+
+                                                @else
+
+                                                    {{ format_currency($item->amount, $invoice->created_by) }}
+
+                                                @endif
+
+                                            </td>
+
+                                        </tr>
+
+                                    @endforeach
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <!-- =========================
+                             TOTALS
+                        ========================== -->
+
+                        <div class="totals-section clearfix">
+
+                            <div class="notes-card">
+
+                                <div class="notes-label">
+                                    Notes
+                                </div>
+
+                                <div class="notes-content">
+                                    8742804982042804
+                                    <br>
+                                    HNB Bank - Kohuwala
+                                </div>
+
+                            </div>
+
+                            <div class="totals-card">
+
+                                <table class="totals-table">
+
+                                    <tr>
+
+                                        <td class="totals-label">
+                                            Sub Total
+                                        </td>
+
+                                        <td class="totals-value">
+                                            {{ format_currency($invoice->subtotal, $invoice->created_by) }}
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+
+                                        <td class="totals-label">
+                                            Discount
+                                        </td>
+
+                                        <td class="totals-value">
+                                            {{ format_currency(0, $invoice->created_by) }}
+                                        </td>
+
+                                    </tr>
+
+                                    <tr class="grand-total">
+
+                                        <td class="grand-total-label">
+                                            Total
+                                        </td>
+
+                                        <td class="grand-total-value">
+                                            {{ format_currency($invoice->total, $invoice->created_by) }}
+                                        </td>
+
+                                    </tr>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div> <!-- Close body -->
+
+                </div> <!-- Close invoice-card -->
+
+            </div> <!-- Close invoice-content -->
+
+        </div> <!-- Close invoice-wrapper -->
+
+    </div> <!-- Close page-container -->
+
+    <!-- =========================
+         FOOTER (Using Fixed Placement for DOMPDF Context)
+    ========================== -->
+    <div class="footer">
+
+        <div class="footer-brand">
+            QueueBill Automated Billing Service
+        </div>
+
+        <div>
+            Thank you for your business.
+            Please contact us for any invoice clarification.
         </div>
 
     </div>
