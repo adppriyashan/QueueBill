@@ -62,57 +62,59 @@
         </div>
     </div>
 
-    <!-- Sandbox Command simulation panel -->
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 animate-fade-in stagger-3">
-        <div class="card-header bg-white border-bottom p-4">
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                    <div class="rounded-3 p-2 bg-warning-soft text-warning me-3">
-                        <i class="fas fa-server fa-lg"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-1">QueueBill Simulation Sandbox</h5>
-                        <p class="text-secondary mb-0 fs-7">Manually execute periodic automated billing runs without
-                            accessing CLI schedulers.</p>
-                    </div>
-                </div>
-                <span class="badge bg-warning text-dark px-3 py-1.5 rounded-3 fs-8 text-uppercase"><i
-                        class="fas fa-shield-alt me-1"></i>Simulation</span>
-            </div>
-        </div>
-        <div class="card-body p-4">
-            @if(session('cron_output'))
-                <div class="mb-4">
-                    <h6 class="fw-bold text-dark mb-2">Simulated Artisan Engine Log Output:</h6>
-                    <pre class="bg-dark text-success p-3 rounded-3 border fs-8 mb-0"
-                        style="max-height: 250px; overflow-y: auto; font-family: monospace;">{{ session('cron_output') }}</pre>
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('sandbox.cron') }}" class="p-3 bg-light rounded-4 border">
-                @csrf
-                <div class="row g-3 align-items-end">
-                    <div class="col-12 col-md-5">
-                        <label for="simulation_date" class="form-label text-secondary fw-semibold fs-7 mb-2">Set Simulation
-                            Run Target Date <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="far fa-calendar-alt text-muted"></i></span>
-                            <input type="date" class="form-control" id="simulation_date" name="simulation_date"
-                                value="{{ date('Y-m-d') }}" required>
+    @if (Auth::check() && Auth::user()->email == 'admin@queuebill.com')
+        <!-- Sandbox Command simulation panel -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 animate-fade-in stagger-3">
+            <div class="card-header bg-white border-bottom p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-3 p-2 bg-warning-soft text-warning me-3">
+                            <i class="fas fa-server fa-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1">QueueBill Simulation Sandbox</h5>
+                            <p class="text-secondary mb-0 fs-7">Manually execute periodic automated billing runs without
+                                accessing CLI schedulers.</p>
                         </div>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <button type="submit" class="btn btn-warning w-100 py-2.5 fw-semibold fs-7"><i
-                                class="fas fa-play me-2"></i>Tick Midnight Cron Run</button>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <div class="fs-8 text-muted mt-2 mt-md-0"><i class="fas fa-info-circle me-1"></i> Running advances
-                            billing cycles, processes pending ad-hoc injections, and logs simulated transactions.</div>
-                    </div>
+                    <span class="badge bg-warning text-dark px-3 py-1.5 rounded-3 fs-8 text-uppercase"><i
+                            class="fas fa-shield-alt me-1"></i>Simulation</span>
                 </div>
-            </form>
+            </div>
+            <div class="card-body p-4">
+                @if(session('cron_output'))
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-2">Simulated Artisan Engine Log Output:</h6>
+                        <pre class="bg-dark text-success p-3 rounded-3 border fs-8 mb-0"
+                            style="max-height: 250px; overflow-y: auto; font-family: monospace;">{{ session('cron_output') }}</pre>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('sandbox.cron') }}" class="p-3 bg-light rounded-4 border">
+                    @csrf
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-5">
+                            <label for="simulation_date" class="form-label text-secondary fw-semibold fs-7 mb-2">Set Simulation
+                                Run Target Date <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="far fa-calendar-alt text-muted"></i></span>
+                                <input type="date" class="form-control" id="simulation_date" name="simulation_date"
+                                    value="{{ date('Y-m-d') }}" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <button type="submit" class="btn btn-warning w-100 py-2.5 fw-semibold fs-7"><i
+                                    class="fas fa-play me-2"></i>Tick Midnight Cron Run</button>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <div class="fs-8 text-muted mt-2 mt-md-0"><i class="fas fa-info-circle me-1"></i> Running advances
+                                billing cycles, processes pending ad-hoc injections, and logs simulated transactions.</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    @endif
 
     <div class="row g-4">
         <!-- Upcoming schedules -->
