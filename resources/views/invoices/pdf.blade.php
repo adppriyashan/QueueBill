@@ -468,7 +468,7 @@
                                     @endif
 
                                     <div class="company-name">
-                                        {{ $invoice->creator?->name ?? env('APP_NAME', 'QueueBill') }}
+                                        {{ $invoice->creator?->company_name ?? env('APP_NAME', 'QueueBill') }}
                                     </div>
 
                                     <div class="company-meta">
