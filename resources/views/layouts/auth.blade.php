@@ -27,7 +27,7 @@
         }
         
         body {
-            font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background: #f1f5f9;
             min-height: 100vh;
             display: flex;
@@ -35,6 +35,15 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: -0.03em;
         }
 
         /* Animated Background Elements */
