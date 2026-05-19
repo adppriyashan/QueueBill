@@ -50,7 +50,7 @@ namespace {
     if (! function_exists('format_currency')) {
         function format_currency($amount, $userId = null)
         {
-            return currency_symbol($userId).number_format($amount, 2);
+            return currency_symbol($userId).' '.number_format($amount, 2);
         }
     }
 }

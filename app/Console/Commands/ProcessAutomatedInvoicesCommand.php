@@ -2,19 +2,17 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\RecurringService;
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
+use App\Mail\InvoiceStatementMail;
 use App\Models\EmailLog;
 use App\Models\GoogleDriveLog;
-use App\Models\User;
+use App\Models\Invoice;
+use App\Models\RecurringService;
+use App\Services\GoogleDriveService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Mail\InvoiceStatementMail;
-use App\Services\GoogleDriveService;
 
 class ProcessAutomatedInvoicesCommand extends Command
 {
@@ -40,7 +38,7 @@ class ProcessAutomatedInvoicesCommand extends Command
         $simulationDateStr = $this->option('date');
         $today = $simulationDateStr ? Carbon::parse($simulationDateStr) : Carbon::today();
 
-        $this->info("Starting QueueBill cycle billing engine run for simulated date: " . $today->format('Y-m-d'));
+        $this->info('Starting QueueBill cycle billing engine run for simulated date: '.$today->format('Y-m-d'));
 
         // Query active services where next_billing_date <= today AND next_billing_date <= to_date
         $services = RecurringService::where('status', 'active')
@@ -50,7 +48,8 @@ class ProcessAutomatedInvoicesCommand extends Command
             ->get();
 
         if ($services->isEmpty()) {
-            $this->comment("No active subscription billing schedules due for processing.");
+            $this->comment('No active subscription billing schedules due for processing.');
+
             return 0;
         }
 
@@ -77,12 +76,13 @@ class ProcessAutomatedInvoicesCommand extends Command
             }
 
             // 2. Generate Unique Invoice Number: QB-YYYYMMDD-{ServiceID}
-            $invoiceNumber = "QB-" . $today->format('Ymd') . "-" . str_pad($service->id, 4, '0', STR_PAD_LEFT);
+            $invoiceNumber = 'QB-'.$today->format('Ymd').'-'.str_pad($service->id, 4, '0', STR_PAD_LEFT);
 
             // Double check if invoice already exists to avoid duplication
             $exists = Invoice::where('invoice_number', $invoiceNumber)->exists();
             if ($exists) {
                 $this->warn("Invoice {$invoiceNumber} already exists for this cycle run. Skipping.");
+
                 continue;
             }
 
@@ -99,25 +99,27 @@ class ProcessAutomatedInvoicesCommand extends Command
                 'period_to' => $periodTo->format('Y-m-d'),
                 'subtotal' => 0.00,
                 'total' => 0.00,
-                'google_drive_path' => $service->google_drive_path ?? '/QueueBill/Invoices'
+                'google_drive_path' => $service->google_drive_path ?? '/QueueBill/Invoices',
+                'created_by' => $service->created_by,
             ]);
 
             // 4. Inject standard base price item
             $invoice->invoiceItems()->create([
                 'description' => "{$service->name} (Base Subscription)",
                 'amount' => $service->base_cost,
-                'is_adhoc' => false
+                'is_adhoc' => false,
+                'created_by' => $service->created_by,
             ]);
 
             // 5. Parse invoice_includes block line-by-line into individual item descriptions with $0
             $includesLines = explode("\n", $service->invoice_includes);
             foreach ($includesLines as $line) {
                 $trimmedLine = trim($line);
-                if (!empty($trimmedLine)) {
+                if (! empty($trimmedLine)) {
                     $invoice->invoiceItems()->create([
                         'description' => $trimmedLine,
                         'amount' => 0.00,
-                        'is_adhoc' => false
+                        'is_adhoc' => false,
                     ]);
                 }
             }
@@ -126,9 +128,9 @@ class ProcessAutomatedInvoicesCommand extends Command
             $pendingAdjustments = $service->pendingInvoiceLines()->where('billing_status', 'pending')->get();
             foreach ($pendingAdjustments as $adj) {
                 $invoice->invoiceItems()->create([
-                    'description' => $adj->description . " (Ad-hoc Adjustment)",
+                    'description' => $adj->description.' (Ad-hoc Adjustment)',
                     'amount' => $adj->amount,
-                    'is_adhoc' => true
+                    'is_adhoc' => true,
                 ]);
 
                 // Flag the pending line as Invoiced
@@ -140,7 +142,7 @@ class ProcessAutomatedInvoicesCommand extends Command
             $subtotal = $invoice->invoiceItems()->sum('amount');
             $invoice->update([
                 'subtotal' => $subtotal,
-                'total' => $subtotal
+                'total' => $subtotal,
             ]);
 
             // Load relations for PDF rendering context
@@ -156,11 +158,10 @@ class ProcessAutomatedInvoicesCommand extends Command
             $currency = $creator->currency ?? '$';
             $senderEmail = $service->invoiceStructureTemplate->sender_email ?? 'billing@queuebill.com';
             $subjectText = "New Statement Generated: {$invoiceNumber} - QueueBill";
-            $bodyText = "Dear {$service->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nPlease find your invoice document attached to this email.\n\nTotal Due: " . $currency . number_format($subtotal, 2) . "\n\nWarm Regards,\n" . ($creator->company_name ?? env('APP_NAME', 'QueueBill')) . ".";
+            $bodyText = "Dear {$service->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\nYour new statement {$invoiceNumber} has been generated for period {$periodFrom->format('M d, Y')} to {$periodTo->format('M d, Y')}.\n\nPlease find your invoice document attached to this email.\n\nTotal Due: ".$currency.number_format($subtotal, 2)."\n\nWarm Regards,\n".($creator->company_name ?? env('APP_NAME', 'QueueBill')).'.';
 
             $companyName = $creator->company_name;
             $companyEmail = $creator->email;
-            $companyPhone = $creator->phone;
             $companyAddress = $creator->address;
             $companyLogo = $creator->company_logo;
 
@@ -174,13 +175,12 @@ class ProcessAutomatedInvoicesCommand extends Command
                     $companyLogo,
                     $companyName,
                     $companyEmail,
-                    $companyPhone,
                     $companyAddress
                 ));
                 $emailStatus = 'sent';
                 $this->info("  -> Real email statement successfully sent to {$service->company->email}");
             } catch (\Exception $e) {
-                $this->error("  -> Failed to send real email: " . $e->getMessage());
+                $this->error('  -> Failed to send real email: '.$e->getMessage());
             }
 
             EmailLog::create([
@@ -189,13 +189,13 @@ class ProcessAutomatedInvoicesCommand extends Command
                 'recipient' => $service->company->email,
                 'subject' => $subjectText,
                 'body' => $bodyText,
-                'status' => $emailStatus
+                'status' => $emailStatus,
             ]);
 
             // 9. Real Google Drive upload action
             $drivePath = $service->google_drive_path ?? '/QueueBill/Invoices';
             $driveStatus = 'failed';
-            $driveDetails = "Simulated or no integration connected.";
+            $driveDetails = 'Simulated or no integration connected.';
 
             if ($creator && $creator->google_access_token) {
                 try {
@@ -203,14 +203,14 @@ class ProcessAutomatedInvoicesCommand extends Command
                     $fileId = $driveService->uploadFile($creator, $pdfFilename, $pdfData, $drivePath);
                     $driveStatus = 'success';
                     $driveDetails = "Invoice v1 successfully uploaded and saved to Google Drive (ID: {$fileId}) at: '{$drivePath}'.";
-                    $this->info("  -> Real Google Drive upload successful!");
+                    $this->info('  -> Real Google Drive upload successful!');
                 } catch (\Exception $e) {
-                    $driveDetails = "Failed to upload to Google Drive: " . $e->getMessage();
-                    $this->error("  -> Google Drive upload failed: " . $e->getMessage());
+                    $driveDetails = 'Failed to upload to Google Drive: '.$e->getMessage();
+                    $this->error('  -> Google Drive upload failed: '.$e->getMessage());
                 }
             } else {
-                $driveDetails = "Google Drive not connected for the subscription creator. Connect Google Drive in Settings to enable automated backup.";
-                $this->warn("  -> Google Drive not connected for user " . ($creator->name ?? 'Unknown') . ". Sync skipped.");
+                $driveDetails = 'Google Drive not connected for the subscription creator. Connect Google Drive in Settings to enable automated backup.';
+                $this->warn('  -> Google Drive not connected for user '.($creator->name ?? 'Unknown').'. Sync skipped.');
             }
 
             GoogleDriveLog::create([
@@ -218,13 +218,13 @@ class ProcessAutomatedInvoicesCommand extends Command
                 'google_drive_path' => $drivePath,
                 'file_name' => $pdfFilename,
                 'status' => $driveStatus,
-                'details' => $driveDetails
+                'details' => $driveDetails,
             ]);
 
             if ($driveStatus === 'success') {
                 // Save upload stamp on invoice
                 $invoice->update([
-                    'uploaded_to_drive_at' => now()
+                    'uploaded_to_drive_at' => now(),
                 ]);
             }
 
@@ -242,20 +242,21 @@ class ProcessAutomatedInvoicesCommand extends Command
             if ($nextBillingDate->gt($service->to_date)) {
                 $service->update([
                     'status' => 'inactive',
-                    'next_billing_date' => $nextBillingDate->format('Y-m-d')
+                    'next_billing_date' => $nextBillingDate->format('Y-m-d'),
                 ]);
                 $this->info("  -> Advanced next billing window: Exceeded expiration limit ({$service->to_date->format('Y-m-d')}). Contract suspended/completed.");
             } else {
                 $service->update([
-                    'next_billing_date' => $nextBillingDate->format('Y-m-d')
+                    'next_billing_date' => $nextBillingDate->format('Y-m-d'),
                 ]);
-                $this->info("  -> Advanced next billing cycle window to: " . $nextBillingDate->format('Y-m-d'));
+                $this->info('  -> Advanced next billing cycle window to: '.$nextBillingDate->format('Y-m-d'));
             }
 
             $processedCount++;
         }
 
         $this->info("Successfully processed {$processedCount} recurring billing schedules!");
+
         return 0;
     }
 }

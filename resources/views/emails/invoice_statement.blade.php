@@ -25,21 +25,28 @@
         }
 
         .header {
-            color: #ffffff;
+            color: black;
             padding: 30px 40px;
             text-align: center;
         }
 
-        .header h2 {
+        hr {
+            border: none;
+            height: 1px;
+            background-color: rgb(214, 214, 214);
+        }
+
+        .header p {
             margin: 0;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
         .content {
-            padding: 40px;
-            font-size: 16px;
+            padding-left: 40px;
+            padding-right: 40px;
+            font-size: 12px;
         }
 
         .footer {
@@ -57,16 +64,32 @@
     <div class="container">
         <div class="header">
             @if($companyLogo)
+                @php
+                    $logoPath = $companyLogo;
+                    if (!file_exists($logoPath) && file_exists(public_path($logoPath))) {
+                        $logoPath = public_path($logoPath);
+                    } elseif (!file_exists($logoPath) && file_exists(storage_path('app/public/' . str_replace('storage/', '', $logoPath)))) {
+                        $logoPath = storage_path('app/public/' . str_replace('storage/', '', $logoPath));
+                    }
+                @endphp
                 <div style="margin-bottom: 5px;">
-                    <img src="{{ $message->embed($companyLogo) }}" alt="Logo"
-                        style="height: 150px; max-width: 200px; object-fit: contain; display: inline-block;">
+                    @if(file_exists($logoPath))
+                        <img src="{{ $message->embed($logoPath) }}" alt="Logo"
+                            style="height: 150px; max-width: 200px; object-fit: contain; display: inline-block;">
+                    @endif
 
-                    <h2
-                        style="margin: 15px 0 5px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; padding-bottom: 0px; margin-bottom: 0px;">
-                        {{ $companyName }}
-                    </h2>
-                    <small style="color: black">{{ $companyAddress }}</small><br>
-                    <small style="color: black">{{ $companyPhone }} | {{ $companyEmail }}</small>
+                    <p>{{ $companyName }}</p>
+
+                    @if ($companyAddress)
+                        <small style="color: black">{{ $companyAddress }}</small>
+                    @endif
+
+                    @if ($companyEmail)
+                        <br>
+                        <small style="color: black">{{ $companyEmail }}</small>
+                    @endif
+
+                    <hr>
                 </div>
             @endif
         </div>

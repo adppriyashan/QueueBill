@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
-use App\Models\RecurringService;
-use App\Models\PendingInvoiceLine;
+use App\Mail\InvoiceStatementMail;
 use App\Models\EmailLog;
 use App\Models\GoogleDriveLog;
+use App\Models\Invoice;
+use App\Models\PendingInvoiceLine;
+use App\Models\RecurringService;
+use App\Models\User;
+use App\Services\GoogleDriveService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\User;
-use App\Mail\InvoiceStatementMail;
-use App\Services\GoogleDriveService;
+use Illuminate\Support\Facades\Storage;
 
 class InvoiceController extends Controller
 {
@@ -31,6 +33,7 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems']);
+
         return view('invoices.show', compact('invoice'));
     }
 
@@ -47,7 +50,7 @@ class InvoiceController extends Controller
             'amount' => $validated['amount'],
             'billing_status' => 'pending',
             'created_by' => Auth::id(),
-            'updated_by' => Auth::id()
+            'updated_by' => Auth::id(),
         ]);
 
         return redirect()->route('services.show', $service)
@@ -80,7 +83,7 @@ class InvoiceController extends Controller
         $invoice->invoiceItems()->create([
             'description' => $validated['description'],
             'amount' => $validated['amount'],
-            'is_adhoc' => true
+            'is_adhoc' => true,
         ]);
 
         // 3. Recalculate totals
@@ -90,7 +93,7 @@ class InvoiceController extends Controller
         $invoice->update([
             'version' => $newVersion,
             'subtotal' => $newSubtotal,
-            'total' => $newTotal
+            'total' => $newTotal,
         ]);
 
         // 4. Real Email Dispatch (Revised Statement)
@@ -98,10 +101,10 @@ class InvoiceController extends Controller
         $creator = auth()->user() ?? User::first();
         $senderCompany = $creator ? $creator->company_name : env('APP_NAME', 'QueueBill');
 
-        $bodyText = "Dear {$invoice->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\n" .
-                    "Please find attached the Revised Statement (version {$newVersion}) for Invoice {$invoice->invoice_number}.\n\n" .
-                    "Reason for Revision: Added retroactive item: {$validated['description']} (" . currency_symbol() . number_format($validated['amount'], 2) . ").\n" .
-                    "New Total Due: " . currency_symbol() . number_format($newTotal, 2) . "\n\nWarm Regards,\n{$senderCompany}.";
+        $bodyText = "Dear {$invoice->company->name},\n\nThank you for doing business with us! We truly appreciate your continued partnership.\n\n".
+                    "Please find attached the Revised Statement (version {$newVersion}) for Invoice {$invoice->invoice_number}.\n\n".
+                    "Reason for Revision: Added retroactive item: {$validated['description']} (".currency_symbol().number_format($validated['amount'], 2).").\n".
+                    'New Total Due: '.currency_symbol().number_format($newTotal, 2)."\n\nWarm Regards,\n{$senderCompany}.";
 
         // Load relations for PDF rendering context
         $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems', 'creator']);
@@ -116,7 +119,6 @@ class InvoiceController extends Controller
 
         $companyName = $creator->company_name;
         $companyEmail = $creator->email;
-        $companyPhone = $creator->phone;
         $companyAddress = $creator->address;
         $companyLogo = $creator->company_logo;
 
@@ -129,11 +131,10 @@ class InvoiceController extends Controller
                 $companyLogo,
                 $companyName,
                 $companyEmail,
-                $companyPhone,
                 $companyAddress
             ));
             $emailStatus = 'sent';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // failed, status logged below
         }
 
@@ -143,13 +144,13 @@ class InvoiceController extends Controller
             'recipient' => $invoice->company->email,
             'subject' => $subjectText,
             'body' => $bodyText,
-            'status' => $emailStatus
+            'status' => $emailStatus,
         ]);
 
         // 5. Real Google Drive Upload Action
         $drivePath = $invoice->google_drive_path ?? '/QueueBill/Revisions';
         $driveStatus = 'failed';
-        $driveDetails = "Simulated or no integration connected.";
+        $driveDetails = 'Simulated or no integration connected.';
 
         if ($creator && $creator->google_access_token) {
             try {
@@ -157,11 +158,11 @@ class InvoiceController extends Controller
                 $fileId = $driveService->uploadFile($creator, $pdfFilename, $pdfData, $drivePath);
                 $driveStatus = 'success';
                 $driveDetails = "Invoice revision v{$newVersion} successfully uploaded and saved to Google Drive (ID: {$fileId}) at: '{$drivePath}'.";
-            } catch (\Exception $e) {
-                $driveDetails = "Failed to upload revision to Google Drive: " . $e->getMessage();
+            } catch (Exception $e) {
+                $driveDetails = 'Failed to upload revision to Google Drive: '.$e->getMessage();
             }
         } else {
-            $driveDetails = "Google Drive not connected for the subscription creator. Connect Google Drive in Settings to enable automated backup.";
+            $driveDetails = 'Google Drive not connected for the subscription creator. Connect Google Drive in Settings to enable automated backup.';
         }
 
         GoogleDriveLog::create([
@@ -169,26 +170,26 @@ class InvoiceController extends Controller
             'google_drive_path' => $drivePath,
             'file_name' => $pdfFilename,
             'status' => $driveStatus,
-            'details' => $driveDetails
+            'details' => $driveDetails,
         ]);
 
         if ($driveStatus === 'success') {
             // Update upload timestamp on invoice
             $invoice->update([
-                'uploaded_to_drive_at' => now()
+                'uploaded_to_drive_at' => now(),
             ]);
         }
 
         $successMsg = "Invoice {$invoice->invoice_number} successfully revised to v{$newVersion}.";
         if ($emailStatus === 'sent') {
-            $successMsg .= " Revised email statement successfully dispatched.";
+            $successMsg .= ' Revised email statement successfully dispatched.';
         } else {
-            $successMsg .= " Email dispatch failed (check logs).";
+            $successMsg .= ' Email dispatch failed (check logs).';
         }
         if ($driveStatus === 'success') {
             $successMsg .= " Document saved securely to Google Drive path: {$drivePath}.";
         } else {
-            $successMsg .= " Drive backup skipped/failed (check logs/settings).";
+            $successMsg .= ' Drive backup skipped/failed (check logs/settings).';
         }
 
         return redirect()->route('invoices.show', $invoice)
@@ -204,26 +205,26 @@ class InvoiceController extends Controller
         $currency = $creator->currency ?? '$';
 
         $subjectText = "STATEMENT DISPATCH: Invoice {$invoice->invoice_number}";
-        $bodyText = "Dear {$invoice->company->name},\n\n" .
-                    "Please find attached your Statement for Invoice {$invoice->invoice_number}.\n\n" .
-                    "Total Amount Due: " . $currency . number_format($invoice->total, 2) . "\n\n" .
+        $bodyText = "Dear {$invoice->company->name},\n\n".
+                    "Please find attached your Statement for Invoice {$invoice->invoice_number}.\n\n".
+                    'Total Amount Due: '.$currency.' '.number_format($invoice->total, 2)."\n\n".
                     "Warm Regards,\n{$senderCompany}.";
 
         // Load relations for PDF rendering context
         $invoice->load(['company', 'recurringService.invoiceStructureTemplate', 'invoiceItems', 'creator']);
 
         // Generate PDF using the clean, dedicated PDF view
-        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
-        $pdfData = $pdf->output();
         $pdfFilename = "{$invoice->invoice_number}_v{$invoice->version}.pdf";
+        $pdfData = Storage::disk('public')->put($pdfFilename, Pdf::loadView('invoices.pdf', compact('invoice'))->output());
+
+        return 1;
 
         $emailStatus = 'failed';
 
         // Company details for email template
         $companyName = $creator->company_name;
         $companyEmail = $creator->email;
-        $companyPhone = $creator->phone;
-        $companyAddress = $creator->address;
+        $companyAddress = $creator->company_address;
         $companyLogo = $creator->company_logo;
 
         try {
@@ -235,12 +236,17 @@ class InvoiceController extends Controller
                 $companyLogo,
                 $companyName,
                 $companyEmail,
-                $companyPhone,
                 $companyAddress
             ));
             $emailStatus = 'sent';
-        } catch (\Exception $e) {
-            // failed, status logged below
+        } catch (Exception $e) {
+            Log::error('Failed to resend statement email: '.$e->getMessage(), [
+                'invoice_id' => $invoice->id,
+                'sender' => $senderEmail,
+                'recipient' => $invoice->company->email,
+                'subject' => $subjectText,
+                'body' => $bodyText,
+            ]);
         }
 
         EmailLog::create([
@@ -249,7 +255,7 @@ class InvoiceController extends Controller
             'recipient' => $invoice->company->email,
             'subject' => $subjectText,
             'body' => $bodyText,
-            'status' => $emailStatus
+            'status' => $emailStatus,
         ]);
 
         if ($emailStatus === 'sent') {
@@ -258,6 +264,6 @@ class InvoiceController extends Controller
         }
 
         return redirect()->route('invoices.show', $invoice)
-            ->with('error', "Failed to resend statement email. Please check configuration/logs.");
+            ->with('error', 'Failed to resend statement email. Please check configuration/logs.');
     }
 }

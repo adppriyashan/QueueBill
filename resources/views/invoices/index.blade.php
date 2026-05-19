@@ -84,7 +84,7 @@
                                 <td>
                                     <div>
                                         <a href="{{ route('companies.show', $invoice->company) }}"
-                                            class="fw-semibold text-secondary text-decoration-none hover-primary">{{ $invoice->company->name }}</a>
+                                            class="fw-semibold text-secondary text-decoration-none hover-primary fs-7">{{ $invoice->company->name }}</a>
                                     </div>
                                 </td>
                                 <td>
@@ -122,7 +122,7 @@
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ route('invoices.show', $invoice) }}" class="btn btn-sm btn-light btn-sm border"
+                                    <a href="{{ route('invoices.show', $invoice) }}" class="btn btn-sm"
                                         title="Review Invoice Details"><i class="far fa-eye me-1"></i>View / Revise</a>
                                 </td>
                             </tr>
