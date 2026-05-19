@@ -259,7 +259,7 @@
                 style="background: var(--primary-gradient) !important;">
                 <div class="d-flex flex-column justify-content-between">
                     <div>
-                        <h5 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Dynamic Currency</h5>
+                        <h5 class="fw-bold mb-3  text-white"><i class="fas fa-info-circle me-2"></i>Dynamic Currency</h5>
                         <p class="fs-7 opacity-75 mb-3">Changing this setting updates all monetary values in real-time:</p>
                         <ul class="fs-7 opacity-75 ps-3 mb-0">
                             <li class="mb-2">Admin Dashboard reports & total rollups.</li>
