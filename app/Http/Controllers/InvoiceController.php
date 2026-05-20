@@ -200,7 +200,7 @@ class InvoiceController extends Controller
         // 1. Gather context
         $creator = $invoice->creator;
         $senderCompany = $creator->company_name ?? env('APP_NAME', 'QueueBill');
-        $senderEmail = $invoice->recurringService?->invoiceStructureTemplate?->sender_email ?? 'billing@queuebill.com';
+        $senderEmail = $invoice->recurringService?->invoiceStructureTemplate?->sender_email ?? env('MAIL_USERNAME');
         $currency = $creator->currency ?? '$';
 
         $subjectText = "STATEMENT DISPATCH: Invoice {$invoice->invoice_number}";
